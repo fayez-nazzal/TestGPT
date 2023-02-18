@@ -1,0 +1,10 @@
+{
+  "techs": ["jest", "react-testing-library", "userEvent"],
+  "tips": [
+    "use 2 spaces for indentation",
+    "use screen",
+    "wrap each group of tests in a describe block",
+    "when using user event, use an async function and await the user event",
+    "prefer to not use getByTestId"
+  ]
+}

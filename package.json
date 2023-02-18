@@ -1,0 +1,29 @@
+{
+  "name": "testgpt",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "files": [
+    "bin"
+  ],
+  "types": "bin/index.d.ts",
+  "bin": {
+    "testgpt": "bin/index.js"
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^18.14.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "commander": "^10.0.0",
+    "openai": "^3.1.0"
+  }
+}
