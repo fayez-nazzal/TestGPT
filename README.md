@@ -57,13 +57,13 @@ To use TestGPT, follow these steps:
    Alternatively, you can use the shorthand:
 
    ```bash
-   testgpt --i <path to your input file> --o <path to your test output file>
+   testgpt -i <path to your input file> -o <path to your test output file>
    ```
 
    If you don't provide an `--outputFile`, the generated test file will be saved in the same directory as the input file.
 
    ```bash
-   testgpt --i ./src/myComponent.tsx
+   testgpt -i ./src/myComponent.tsx
    # Output file will be ./src/myComponent.test.tsx
    ```
 
