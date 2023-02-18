@@ -1,6 +1,6 @@
 # TestGPT
 
-TestGPT is an open source tool that uses OpenAI API to automatically generate unit tests for your codebase. It helps save time and improve the quality of your code by generating tests that cover a large number of use cases.
+A command-line tool that uses OpenAI API to automatically generate unit tests for your files.
 
 ![image](https://user-images.githubusercontent.com/49946791/219856357-57a55c11-208b-4df3-ad10-ffc465e9d549.gif)
 
