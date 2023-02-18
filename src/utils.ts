@@ -26,7 +26,7 @@ export const getPrompt = (content: string, techs: string[], tips: string[]) =>
     ", "
   )}. Please follow those tips: ${tips.join("\n")}.
   Here is the file:
- ${content}`;
+  ${content}`;
 
 export const readJsonFile = (path: string) => {
   const content = readFile(path);

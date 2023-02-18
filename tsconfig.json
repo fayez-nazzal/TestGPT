@@ -2,9 +2,11 @@
   "compilerOptions": {
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
     "target": "ES2020",
     "sourceMap": true,
     "outDir": "bin"
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "bin", "src/**/*.test.ts"]
 }

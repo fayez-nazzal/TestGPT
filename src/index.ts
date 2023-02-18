@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import chalk from "chalk";
 import { program } from "commander";
-import path from "path";
 import { CONFIG_FILE_NAME } from "./const.js";
 import { readJsonFile, autoTest } from "./utils.js";
+import path from "path";
 
 program.option("-i, --inputFile <char>").option("-o, --outputFile <char>");
 program.parse();
