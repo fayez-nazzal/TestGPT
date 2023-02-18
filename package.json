@@ -30,5 +30,22 @@
     "chalk": "^5.2.0",
     "commander": "^10.0.0",
     "openai": "^3.1.0"
-  }
+  },
+  "keywords": [
+    "gpt3",
+    "openai",
+    "cli",
+    "command-line",
+    "command-line-tool",
+    "cmd",
+    "unit testing",
+    "testing",
+    "test",
+    "auto",
+    "automation"
+  ],
+  "author": "Fayez Nazzal",
+  "license": "MIT",
+  "repository": "https://github.com/fayez-nazzal/testgpt",
+  "bugs": "https://github.com/fayez-nazzal/testgpt/issues"
 }
