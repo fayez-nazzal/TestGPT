@@ -18,7 +18,7 @@ To use TestGPT, follow these steps:
    npm install -g testgpt
    ```
 
-2. Request access to OpenAI Text Completion and export your API key by running the following command:
+2. Request access to [OpenAI API](https://openai.com/api/) and export your API key by running the following command:
    ```bash
    export OPENAI_API_KEY='Your OpenAI API Key'
    ```
