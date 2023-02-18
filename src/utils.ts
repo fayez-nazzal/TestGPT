@@ -29,13 +29,7 @@ export const getPrompt = (content: string, techs: string[], tips: string[]) =>
 
 export const readJsonFile = (path: string) => {
   const content = readFile(path);
-
-  try {
-    return JSON.parse(content);
-  } catch (err) {
-    console.error(`Error parsing JSON: ${err}`);
-    return {};
-  }
+  return JSON.parse(content);
 };
 
 export const getTestContent = async (prompt: string) => {
