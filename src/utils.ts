@@ -15,7 +15,7 @@ export const readFile = (path: string) => {
 export const writeToFile = (path: string, content: string) => {
   try {
     fs.writeFileSync(path, content);
-    console.log(`Successfully wrote to file: ${path}`);
+    console.log(chalk.green(`Successfully wrote to file: ${path}`));
   } catch (err) {
     console.error(`Error writing to file: ${err}`);
   }
