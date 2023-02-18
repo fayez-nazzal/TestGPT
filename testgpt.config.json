@@ -2,6 +2,7 @@
   ".ts": {
     "techs": ["jest"],
     "tips": [
+      "Don't forget to import the things you need",
       "use 2 spaces for indentation",
       "wrap each group of tests in a describe block"
     ]
