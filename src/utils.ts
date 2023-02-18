@@ -24,7 +24,8 @@ export const writeToFile = (path: string, content: string) => {
 export const getPrompt = (content: string, techs: string[], tips: string[]) =>
   `I have the following file, write me unit tests using ${techs.join(
     ", "
-  )}, please ${tips.join(", ")}. Here is the file:
+  )}. Please follow those tips: ${tips.join("\n")}.
+  Here is the file:
  ${content}`;
 
 export const readJsonFile = (path: string) => {
@@ -42,7 +43,13 @@ export const getTestContent = async (prompt: string) => {
   const response = await openai.createCompletion({
     model: "text-davinci-003",
     prompt,
-    max_tokens: 2048,
+    max_tokens: 2018,
+    logprobs: 0,
+    best_of: 1,
+    temperature: 0,
+    top_p: 1,
+    frequency_penalty: 0.5,
+    presence_penalty: 0,
   });
 
   return response.data.choices[0].text;
