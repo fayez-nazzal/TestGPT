@@ -1,5 +1,5 @@
 {
-  ".ts": {
+  ".js": {
     "techs": ["jest"],
     "tips": [
       "Don't forget to import the things you need",
