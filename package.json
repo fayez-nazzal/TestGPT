@@ -1,6 +1,6 @@
 {
   "name": "testgpt",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "type": "module",
@@ -15,21 +15,6 @@
     "build": "tsc",
     "test": "jest",
     "prepublishOnly": "npm run build"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@types/jest": "^29.4.0",
-    "@types/node": "^18.14.0",
-    "jest": "^29.4.3",
-    "ts-jest": "^29.0.5",
-    "typescript": "^4.9.5"
-  },
-  "dependencies": {
-    "chalk": "^5.2.0",
-    "commander": "^10.0.0",
-    "openai": "^3.1.0"
   },
   "keywords": [
     "gpt3",
@@ -46,6 +31,18 @@
   ],
   "author": "Fayez Nazzal",
   "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.4.0",
+    "@types/node": "^18.14.0",
+    "jest": "^29.4.3",
+    "ts-jest": "^29.0.5",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "chalk": "^5.2.0",
+    "commander": "^10.0.0",
+    "openai": "^3.2.1"
+  },
   "repository": "https://github.com/fayez-nazzal/testgpt",
   "bugs": "https://github.com/fayez-nazzal/testgpt/issues"
 }

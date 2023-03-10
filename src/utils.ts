@@ -21,12 +21,23 @@ export const writeToFile = (path: string, content: string) => {
   }
 };
 
-export const getPrompt = (content: string, techs: string[], tips: string[]) =>
-  `I have the following file, write me unit tests using ${techs.join(
-    ", "
-  )}. Please follow those tips: ${tips.join("\n")}.
-  Here is the file:
-  ${content}`;
+export const getPrompt = (content: string, techs: string[], tips: string[]) => {
+  let prompt =
+    "Please write unit tests for the following file given using the following technologies";
+  prompt += techs.join(", ");
+
+  if (tips.length) {
+    prompt += " and the following tips";
+    prompt += tips.join(", ");
+  }
+
+  prompt +=
+    "Please only give the text of the code, don't include any other text or details.";
+
+  prompt += content;
+
+  return prompt;
+};
 
 export const readJsonFile = (path: string) => {
   const content = readFile(path);
@@ -40,19 +51,23 @@ export const getTestContent = async (prompt: string) => {
 
   const openai = new OpenAIApi(configuration);
 
-  const response = await openai.createCompletion({
-    model: "text-davinci-003",
-    prompt,
-    max_tokens: 2018,
-    logprobs: 0,
-    best_of: 1,
-    temperature: 0,
-    top_p: 1,
-    frequency_penalty: 0.5,
-    presence_penalty: 0,
+  const response = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "system",
+        content: "You are a unit test generator.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
   });
 
-  return response.data.choices[0].text;
+  // remove lines that start with ``` (markdown code block)
+  const regex = /^```.*$/gm;
+  return response.data.choices[0].message.content?.replace(regex, "");
 };
 
 interface IAutoTestArgs {
