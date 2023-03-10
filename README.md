@@ -21,27 +21,34 @@ To use TestGPT, follow these steps:
 2. Request access to [OpenAI API](https://openai.com/api/) and obtain your [API key](https://platform.openai.com/account/api-keys).
    
    You then need to export your OpenAI key. Follow the steps to export for your OS:
-   - If you are a macOS user ( or zsh user on Linux ), append this to `.zshrc` in your `home` or `~` directory
+   - If you are a macOS user ( or zsh user on Linux ), append this line to `.zshrc` in your `home` or `~` directory:
 
-   ```zsh
-   export OPENAI_API_KEY='Your OpenAI API Key.’
-   ```
-   
-   Then run the command:
-
-   ````zsh
-   source ~/.zshrc
-   ```
+      ```zsh
+      export OPENAI_API_KEY='Your OpenAI API Key.’
+      ```
+      
+      Then run the command:
+      
+      ```zsh
+      source ~/.zshrc
+      ```
+      
    - If you are a Linux user, append the same line to `~/.bashrc`
+      
+      ```bash
+      export OPENAI_API_KEY='Your OpenAI API Key.’
+      ```
+      
+      Then run the command:
+      
+      ```bash
+      source ~/.bashrc
+      ```
 
-   ````bash
-   export OPENAI_API_KEY='Your OpenAI API Key.’
-   ```
-
-   - If you are a windows user, go to System->Settings->Advanced->Environment Variables, under `System Variables,` click `New` and a new entry with the key `OPENAI_API_KEY` and substitute your OpenAI API Key as value.
+   - If you are a windows user, go to `System->Settings->Advanced->Environment Variables`, under `System Variables,` click `New` and a new entry with the key `OPENAI_API_KEY` and substitute your OpenAI API Key as the value.
    
 
-3. Add a `testgpt.config.json` file to the root directory of your project. you can specify the technologies and tips for each file extension. Here's an example:
+3. Now inside your project where you want to auto-generate unit tests, you need to have a file called `testgpt.config.json` file in your project's root directory. you can specify the technologies and tips for each file extension. Here's an example:
 
    ```json
    {
@@ -67,21 +74,21 @@ To use TestGPT, follow these steps:
    }
    ```
 
-4. Auto-generate unit tests by running this command
+4. Auto-generate unit tests by running this command from the root director of your project ( same place where you have testgpt.config.json ):
 
-   ```bash
+   ```zsh
    testgpt --inputFile <path to your input file> --outputFile <path to your test output file>
    ```
 
    Alternatively, you can use the shorthand:
 
-   ```bash
+   ```zsh
    testgpt -i <path to your input file> -o <path to your test output file>
    ```
 
    If you don't provide an `--outputFile`, the generated test file will be saved in the same directory as the input file.
 
-   ```bash
+   ```zsh
    testgpt -i ./src/myComponent.tsx
    # Output file will be ./src/myComponent.test.tsx
    ```
