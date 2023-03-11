@@ -24,7 +24,7 @@ To use TestGPT, follow these steps:
    - If you are a macOS user ( or zsh user on Linux ), append this line to `.zshrc` in your `home` or `~` directory:
 
       ```zsh
-      export OPENAI_API_KEY='Your OpenAI API Key.’
+      export OPENAI_API_KEY="Your OpenAI API Key."
       ```
       
       Then run the command:
@@ -36,7 +36,7 @@ To use TestGPT, follow these steps:
    - If you are a Linux user, append the same line to `~/.bashrc`
       
       ```bash
-      export OPENAI_API_KEY='Your OpenAI API Key.’
+      export OPENAI_API_KEY="Your OpenAI API Key."
       ```
       
       Then run the command:
