@@ -1,6 +1,6 @@
 # TestGPT
 
-A command-line tool that uses OpenAI API to generate unit tests for your files automatically.
+A command-line tool for generating unit tests for your files automatically using OpenAI API.
 
 ![](testgpt.webp)
 
@@ -8,20 +8,20 @@ A command-line tool that uses OpenAI API to generate unit tests for your files a
 
 To use TestGPT, follow these steps:
 
-1. Install TestGPT by running one of the following commands:
+1. Install TestGPT by running one of these commands:
 
    ```zsh
    # Install globally
    npm install -g testgpt@latest
-   
+
    # OR install locally in your project
    npm install testgpt@latest
    ```
 
-2. Request access to [OpenAI API](https://openai.com/api/) and obtain your [API key](https://platform.openai.com/account/api-keys).
+2. **Get your OpenAI API** key by requesting access to the [OpenAI API](https://openai.com/api/) and obtaining your [API key](https://platform.openai.com/account/api-keys). Then, export your OpenAI key based on your operating system:
    
    You then need to export your OpenAI key. Follow the steps to export for your OS:
-   - If you are a macOS user ( or zsh user on Linux ), append this line to `.zshrc` in your `home` or `~` directory:
+   - **macOS or Linux (zsh):** Add the following line to .zshrc in your home or ~ directory:
 
       ```zsh
       export OPENAI_API_KEY="Your OpenAI API Key."
@@ -33,7 +33,7 @@ To use TestGPT, follow these steps:
       source ~/.zshrc
       ```
       
-   - If you are a Linux user, append the same line to `~/.bashrc`
+   - **Linux (bash):** Add the following line to ~/.bashrc:
       
       ```bash
       export OPENAI_API_KEY="Your OpenAI API Key."
@@ -45,10 +45,10 @@ To use TestGPT, follow these steps:
       source ~/.bashrc
       ```
 
-   - If you are a windows user, go to `System->Settings->Advanced->Environment Variables`, under `System Variables,` click `New` and a new entry with the key `OPENAI_API_KEY` and substitute your OpenAI API Key as the value.
+   - **Windows:** Go to System -> Settings -> Advanced -> Environment Variables, click New under System Variables, and create a new entry with the key `OPENAI_API_KEY` and your OpenAI API Key as the value.
    
 
-3. Now inside your project where you want to auto-generate unit tests, you need to have a file called `testgpt.config.json` file in your project's root directory. you can specify the technologies and tips for each file extension. Here's an example:
+3. **[Optional]** Create a `testgpt.config.json` file in your project's root directory to specify technologies and tips for each file extension. Example:
 
    ```json
    {
@@ -74,23 +74,29 @@ To use TestGPT, follow these steps:
    }
    ```
 
-4. Auto-generate unit tests by running this command from the root director of your project ( same place where you have testgpt.config.json ):
-
-   ```zsh
-   testgpt --inputFile <path to your input file> --outputFile <path to your test output file>
-   ```
-
-   Alternatively, you can use the shorthand:
+4. If you have `testgpt.config.json` you can  **Generate** unit tests by running this command from your project's root directory (where testgpt.config.json is located):
 
    ```zsh
    testgpt -i <path to your input file> -o <path to your test output file>
    ```
 
-   If you don't provide an `--outputFile`, the generated test file will be saved in the same directory as the input file.
+   If you don't provide an `--outputFile`/`-o`, the generated test file will be saved in the same directory as the input file.
 
    ```zsh
-   testgpt -i ./src/myComponent.tsx
-   # Output file will be ./src/myComponent.test.tsx
+   testgpt -i ./src/component.tsx
+   # Output file will be ./src/component.test.tsx
+   ```
+
+   You can also pass the `config` file path using the `--config`/`-c` argument.
+
+   ```zsh
+   testgpt -i ./src/component.tsx -c `./testgpt.config.json`
+   ```
+
+   Or pass `--techs`/`-t` and `--tips`/`-p` directly
+
+      ```zsh
+   testgpt -i ./src/component.tsx --techs react,jest --tips "Don't forget to import what you need"`
    ```
 
 ## License
