@@ -5,7 +5,12 @@ import { CONFIG_FILE_NAME } from "./const.js";
 import { readJsonFile, autoTest } from "./utils.js";
 import path from "path";
 
-program.option("-i, --inputFile <char>").option("-o, --outputFile <char>");
+program
+  .option("-i, --inputFile <char>")
+  .option("-o, --outputFile <char>")
+  .option("-t, --techs <char>")
+  .option("-p, --tips <char>")
+  .option("-c, --config <char>");
 program.parse();
 
 interface IConfig {
@@ -17,17 +22,6 @@ interface IConfig {
 
 const options = program.opts();
 
-console.log(chalk.blue(`Reading ${CONFIG_FILE_NAME}...`));
-
-let config: IConfig;
-
-try {
-  config = readJsonFile(path.join(process.cwd(), `${CONFIG_FILE_NAME}`));
-} catch (err) {
-  console.error(chalk.red(`Please create ${CONFIG_FILE_NAME}`));
-  process.exit(1);
-}
-
 const inputFile = options.inputFile;
 
 if (!inputFile) {
@@ -35,8 +29,34 @@ if (!inputFile) {
   process.exit(1);
 }
 
-let outputFile = options.outputFile;
 let inputFileExtension = path.extname(inputFile);
+
+console.log(chalk.blue(`Reading ${CONFIG_FILE_NAME}...`));
+
+let config: IConfig;
+
+console.log(chalk.blue(`inputFile extension: ${inputFileExtension}`));
+
+try {
+  config = readJsonFile(
+    options.config || path.join(process.cwd(), `${CONFIG_FILE_NAME}`)
+  );
+} catch (err) {
+  if (options.techs) {
+    console.log(chalk.blue(`Config not found, using passed configs`));
+
+    config = {
+      [inputFileExtension]: {
+        techs: options.techs?.split(",") || [],
+        tips: options.tips?.split(",") || [],
+      },
+    };
+  } else {
+    console.log(chalk.blue(`Config not found, continuing without config`));
+  }
+}
+
+let outputFile = options.outputFile;
 
 if (!outputFile) {
   const inputFileWithoutExtension = inputFile.replace(inputFileExtension, "");
@@ -48,28 +68,8 @@ if (!outputFile) {
   console.log(chalk.yellow(`Output file: ${outputFile}`));
 }
 
-const extensionConfig = config[inputFileExtension];
-
-if (!extensionConfig) {
-  console.error(
-    chalk.red(
-      `Please create config for the '${inputFileExtension}' extension to ${CONFIG_FILE_NAME}`
-    )
-  );
-  process.exit(1);
-}
-
-const techs = config[inputFileExtension].techs;
-const tips = config[inputFileExtension].tips || [];
-
-if (!techs || !techs.length) {
-  console.error(
-    chalk.red(
-      `Please add techs for the '${inputFile}' extension to ${CONFIG_FILE_NAME}`
-    )
-  );
-  process.exit(1);
-}
+const techs = config?.[inputFileExtension]?.techs;
+const tips = config?.[inputFileExtension]?.tips || [];
 
 autoTest({
   techs,

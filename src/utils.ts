@@ -21,18 +21,25 @@ export const writeToFile = (path: string, content: string) => {
   }
 };
 
-export const getPrompt = (content: string, techs: string[], tips: string[]) => {
-  let prompt =
-    "Please write unit tests for the following file given using the following technologies";
-  prompt += techs.join(", ");
+export const getPrompt = (
+  content: string,
+  techs?: string[],
+  tips?: string[]
+) => {
+  let prompt = "Please write unit tests for the following file given";
 
-  if (tips.length) {
+  if (techs?.length) {
+    prompt += " using the following technologies";
+    prompt += techs.join(", ");
+  }
+
+  if (tips?.length) {
     prompt += " and the following tips";
     prompt += tips.join(", ");
   }
 
   prompt +=
-    "Please only give the text of the code, don't include any other text or details.";
+    'Please only give the code directly, without any additional text, without any additional details, your answer should be only the code block of the unit tests without anything else, don\'t tell anything like "Here are the unit tests", just answer with the code block.';
 
   prompt += content;
 
@@ -71,17 +78,17 @@ export const getTestContent = async (prompt: string) => {
 };
 
 interface IAutoTestArgs {
-  techs: string[];
-  tips: string[];
   inputFile: string;
   outputFile: string;
+  techs?: string[];
+  tips?: string[];
 }
 
 export const autoTest = async ({
-  techs,
-  tips,
   inputFile,
   outputFile,
+  techs,
+  tips,
 }: IAutoTestArgs) => {
   console.log(chalk.blue("Reading input file..."));
 
