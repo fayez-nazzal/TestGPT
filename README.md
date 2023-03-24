@@ -1,8 +1,18 @@
 # TestGPT
 
-A command-line tool for generating unit tests for your files automatically using OpenAI API.
+A command-line tool for generating unit tests for your files automatically using OpenAI GPT-3.5-turbo model (gpt-4 also supported for developers who have it).
 
-![](testgpt.webp)
+> If you have access to GPT-4 API, you can now pass `--model`/`-m` option, see below for an example. 
+
+> Now there is a VScode extension the process even faster, check the extension [here](https://marketplace.visualstudio.com/items?itemName=FayezNazzal.testgpt) (You have to install the latest version of testgpt for it to work)
+
+<br />
+
+<div align="center">
+   <img src="./show.gif" alt="Show" />
+</div>
+
+<br />
 
 ## Installation 
 
@@ -48,7 +58,22 @@ To use TestGPT, follow these steps:
    - **Windows:** Go to System -> Settings -> Advanced -> Environment Variables, click New under System Variables, and create a new entry with the key `OPENAI_API_KEY` and your OpenAI API Key as the value.
    
 
-3. **[Optional]** Create a `testgpt.config.json` file in your project's root directory to specify technologies and tips for each file extension. Example:
+3. If you have `testgpt.config.json` you can  **Generate** unit tests by running this command from your project's root directory (where testgpt.config.json is located):
+
+   ```zsh
+   testgpt -i <path to your input file> -o <path to your test output file>
+   ```
+
+   If you don't provide an `--outputFile`/`-o`, the generated test file will be saved in the same directory as the input file.
+
+   ```zsh
+   testgpt -i ./src/component.tsx
+   # Output file will be ./src/component.test.tsx
+   ```
+
+## Providing custom techs using a config file
+
+You can create a `testgpt.config.json` file in your project's root directory to specify technologies and tips for each file extension. Example:
 
    ```json
    {
@@ -72,32 +97,36 @@ To use TestGPT, follow these steps:
        ]
      }
    }
-   ```
+```
 
-4. If you have `testgpt.config.json` you can  **Generate** unit tests by running this command from your project's root directory (where testgpt.config.json is located):
+Then you can run the following command from the same directory as the config file:
+
+```zsh
+testgpt -i ./src/component.tsx
+```
+
+You can also pass the `config` file path using the `--config`/`-c` argument.
+
+```zsh
+testgpt -i ./src/component.tsx -c `./testgpt.config.json`
+```
+
+## Providing custom techs directly
+
+   You can pass `--techs`/`-t` and `--tips`/`-p` directly inside each comman
 
    ```zsh
-   testgpt -i <path to your input file> -o <path to your test output file>
-   ```
-
-   If you don't provide an `--outputFile`/`-o`, the generated test file will be saved in the same directory as the input file.
-
-   ```zsh
-   testgpt -i ./src/component.tsx
-   # Output file will be ./src/component.test.tsx
-   ```
-
-   You can also pass the `config` file path using the `--config`/`-c` argument.
-
-   ```zsh
-   testgpt -i ./src/component.tsx -c `./testgpt.config.json`
-   ```
-
-   Or pass `--techs`/`-t` and `--tips`/`-p` directly
-
-      ```zsh
    testgpt -i ./src/component.tsx --techs react,jest --tips "Don't forget to import what you need"`
    ```
+
+
+## Providing custom model
+
+You can pass `--model`/`-m` option to use a custom model other than the default (currently gpt-3.5-turbo):
+
+```zsh
+testgpt -i ./src/component.tsx -m gpt-4
+```
 
 ## License
 
