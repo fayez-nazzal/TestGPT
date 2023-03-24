@@ -21,6 +21,7 @@ export const writeToFile = (path: string, content: string) => {
   }
 };
 
+
 export const getPrompt = (
   content: string,
   techs?: string[],
@@ -51,7 +52,13 @@ export const readJsonFile = (path: string) => {
   return JSON.parse(content);
 };
 
-export const getTestContent = async (prompt: string, apiKey: string) => {
+export type IModel = "gpt-3.5-turbo" | "gpt-3.5-turbo-0301" | "gpt-4";
+
+export const getTestContent = async (
+  prompt: string,
+  apiKey: string,
+  model: IModel
+) => {
   const configuration = new Configuration({
     apiKey: apiKey,
   });
@@ -59,7 +66,7 @@ export const getTestContent = async (prompt: string, apiKey: string) => {
   const openai = new OpenAIApi(configuration);
 
   const response = await openai.createChatCompletion({
-    model: "gpt-3.5-turbo",
+    model,
     messages: [
       {
         role: "system",
@@ -81,6 +88,7 @@ interface IAutoTestArgs {
   inputFile: string;
   outputFile: string;
   apiKey: string;
+  model: IModel;
   techs?: string[];
   tips?: string[];
 }
@@ -89,6 +97,7 @@ export const autoTest = async ({
   inputFile,
   outputFile,
   apiKey,
+  model,
   techs,
   tips,
 }: IAutoTestArgs) => {
@@ -105,6 +114,6 @@ export const autoTest = async ({
   console.log(chalk.blue("Generating tests..."));
 
   const prompt = getPrompt(content, techs, tips);
-  const testContent = await getTestContent(prompt, apiKey);
+  const testContent = await getTestContent(prompt, apiKey, model);
   writeToFile(outputFile, testContent);
 };
