@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import chalk from "chalk";
 import { program } from "commander";
-import { CONFIG_FILE_NAME } from "./const.js";
+import { CONFIG_FILE_NAME, DEFAULT_MODEL } from "./const.js";
 import { readJsonFile, autoTest } from "./utils.js";
 import path from "path";
 import fs from "fs";
@@ -10,6 +10,7 @@ program
   .option("-i, --inputFile <char>")
   .option("-o, --outputFile <char>")
   .option("-k, --apiKey <char>")
+  .option("-m, --model <char>")
   .option("-t, --techs <char>")
   .option("-p, --tips <char>")
   .option("-c, --config <char>");
@@ -78,10 +79,13 @@ const tips = config?.[inputFileExtension]?.tips || [];
 
 const apiKey = process.env.OPENAI_API_KEY || options.apiKey;
 
+const model = options.model || DEFAULT_MODEL;
+
 autoTest({
   inputFile,
   outputFile,
   apiKey,
+  model,
   techs,
   tips,
 });
