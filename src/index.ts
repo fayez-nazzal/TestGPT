@@ -4,6 +4,7 @@ import { program } from "commander";
 import { CONFIG_FILE_NAME } from "./const.js";
 import { readJsonFile, autoTest } from "./utils.js";
 import path from "path";
+import fs from "fs";
 
 program
   .option("-i, --inputFile <char>")
@@ -37,11 +38,13 @@ let config: IConfig;
 
 console.log(chalk.blue(`inputFile extension: ${inputFileExtension}`));
 
-try {
+const configFilePath = path.join(process.cwd(), `${CONFIG_FILE_NAME}`);
+
+if (fs.existsSync(configFilePath)) {
   config = readJsonFile(
     options.config || path.join(process.cwd(), `${CONFIG_FILE_NAME}`)
   );
-} catch (err) {
+} else {
   if (options.techs) {
     console.log(chalk.blue(`Config not found, using passed configs`));
 
