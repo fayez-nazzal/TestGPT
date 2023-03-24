@@ -9,9 +9,11 @@ import fs from "fs";
 program
   .option("-i, --inputFile <char>")
   .option("-o, --outputFile <char>")
+  .option("-k, --apiKey <char>")
   .option("-t, --techs <char>")
   .option("-p, --tips <char>")
   .option("-c, --config <char>");
+
 program.parse();
 
 interface IConfig {
@@ -74,9 +76,12 @@ if (!outputFile) {
 const techs = config?.[inputFileExtension]?.techs;
 const tips = config?.[inputFileExtension]?.tips || [];
 
+const apiKey = process.env.OPENAI_API_KEY || options.apiKey;
+
 autoTest({
-  techs,
-  tips,
   inputFile,
   outputFile,
+  apiKey,
+  techs,
+  tips,
 });

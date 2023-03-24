@@ -51,9 +51,9 @@ export const readJsonFile = (path: string) => {
   return JSON.parse(content);
 };
 
-export const getTestContent = async (prompt: string) => {
+export const getTestContent = async (prompt: string, apiKey: string) => {
   const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: apiKey,
   });
 
   const openai = new OpenAIApi(configuration);
@@ -80,6 +80,7 @@ export const getTestContent = async (prompt: string) => {
 interface IAutoTestArgs {
   inputFile: string;
   outputFile: string;
+  apiKey: string;
   techs?: string[];
   tips?: string[];
 }
@@ -87,6 +88,7 @@ interface IAutoTestArgs {
 export const autoTest = async ({
   inputFile,
   outputFile,
+  apiKey,
   techs,
   tips,
 }: IAutoTestArgs) => {
@@ -103,6 +105,6 @@ export const autoTest = async ({
   console.log(chalk.blue("Generating tests..."));
 
   const prompt = getPrompt(content, techs, tips);
-  const testContent = await getTestContent(prompt);
+  const testContent = await getTestContent(prompt, apiKey);
   writeToFile(outputFile, testContent);
 };
