@@ -13,7 +13,8 @@ program
   .option("-m, --model <char>")
   .option("-t, --techs <char>")
   .option("-p, --tips <char>")
-  .option("-c, --config <char>");
+  .option("-c, --config <char>")
+  .option("-h, --help");
 
 program.parse();
 
@@ -25,6 +26,23 @@ interface IConfig {
 }
 
 const options = program.opts();
+
+if (options.help) {
+  console.log(
+    chalk.blue(
+      `Usage: testgpt -i <inputFile> -o <outputFile> -k <apiKey> -m <model> -t <techs> -p <tips> -c <config>`
+    )
+  );
+
+  console.log(
+    chalk.green(
+      "\r\nAll fields are optional except for the input file. If no output file is provided, the default will be used."
+    )
+  );
+
+  // exit the program
+  process.exit(0);
+}
 
 const inputFile = options.inputFile;
 
