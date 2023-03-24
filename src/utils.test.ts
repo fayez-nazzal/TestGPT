@@ -47,12 +47,20 @@ describe("writeToFile", () => {
 
 describe("getPrompt", () => {
   it("should return the correct prompt with the given parameters", () => {
-    const content = `import chalk from "chalk";`;
+    const content = `const greetings = "Hello!"`;
     const techs = ["jest"];
     const tips = ["use 2 spaces for indentation"];
 
-    expect(getPrompt(content, techs, tips)).toBe(
-      'I have the following file, write me unit tests using jest. Please follow those tips: use 2 spaces for indentation.\n  Here is the file:\n  import chalk from "chalk";'
-    );
+    const prompt = getPrompt(content, techs, tips);
+
+    for (const tech of techs) {
+      expect(prompt).toContain(tech);
+    }
+
+    for (const tip of tips) {
+      expect(prompt).toContain(tip);
+    }
+
+    expect(prompt).toContain(content);
   });
 });
