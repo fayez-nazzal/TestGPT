@@ -2,7 +2,7 @@
 import chalk from "chalk";
 import { program } from "commander";
 import { CONFIG_FILE_NAME, DEFAULT_MODEL } from "./const.js";
-import { readYamlFile, autoTest } from "./utils.js";
+import { readYamlFile, autoTest, IGuide } from "./utils.js";
 import path from "path";
 import fs from "fs";
 
@@ -17,12 +17,6 @@ program
   .option("-h, --help");
 
 program.parse();
-
-interface IGuide {
-  fileName: string;
-  code: string;
-  tests: string;
-}
 
 interface IConfig {
   [key: `.${string}`]: {
@@ -112,6 +106,7 @@ autoTest({
   outputFile,
   apiKey,
   model,
+  guide,
   techs,
   tips,
 });
