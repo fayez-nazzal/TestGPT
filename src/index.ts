@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import chalk from "chalk";
 import { program } from "commander";
-import { CONFIG_FILE_NAME, DEFAULT_MODEL } from "./const.js";
-import { readYamlFile, autoTest, IGuide } from "./utils.js";
+import { CONFIG_FILE_NAME, DEFAULT_MODEL } from "./const";
+import { readYamlFile, autoTest } from "./utils";
 import path from "path";
 import fs from "fs";
+import { IConfig } from "./types";
 
 program
   .option("-i, --inputFile <char>")
@@ -17,14 +18,6 @@ program
   .option("-h, --help");
 
 program.parse();
-
-interface IConfig {
-  [key: `.${string}`]: {
-    techs: string[];
-    tips: string[];
-    guide: IGuide[];
-  };
-}
 
 const options = program.opts();
 

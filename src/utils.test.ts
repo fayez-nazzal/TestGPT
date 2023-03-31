@@ -7,13 +7,11 @@ import {
   readYamlFile,
   initOpenAI,
   getCompletionRequest,
-  getTestContent,
-  autoTest,
 } from "./utils";
 import fs from "fs";
 import { Configuration, OpenAIApi } from "openai";
-import { parse } from "yaml";
 import chalk from "chalk";
+import { ERole } from "./types";
 
 jest.mock("chalk", () => ({
   blue: jest.fn((text) => text),
@@ -180,7 +178,7 @@ describe("utils", () => {
       const prompt = "prompt text";
       const examples = [
         {
-          role: "user" as "user",
+          role: ERole.User,
           content: "test prompt",
         },
       ];
