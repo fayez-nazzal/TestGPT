@@ -1,6 +1,6 @@
 import chalk from "chalk";
 import fs from "fs";
-import { Configuration, OpenAIApi } from "openai";
+import { Configuration, CreateChatCompletionRequest, OpenAIApi } from "openai";
 
 export const readFile = (path: string) => {
   try {
@@ -20,7 +20,6 @@ export const writeToFile = (path: string, content: string) => {
     console.error(`Error writing to file: ${err}`);
   }
 };
-
 
 export const getPrompt = (
   content: string,
@@ -54,18 +53,20 @@ export const readJsonFile = (path: string) => {
 
 export type IModel = "gpt-3.5-turbo" | "gpt-3.5-turbo-0301" | "gpt-4";
 
-export const getTestContent = async (
-  prompt: string,
-  apiKey: string,
-  model: IModel
-) => {
+export const initOpenAI = async (apiKey: string) => {
   const configuration = new Configuration({
     apiKey: apiKey,
   });
 
   const openai = new OpenAIApi(configuration);
 
-  const response = await openai.createChatCompletion({
+  return openai;
+};
+
+export type ICompletionRequest = CreateChatCompletionRequest;
+
+export const getCompletionRequest = (model: IModel, prompt: string) => {
+  return {
     model,
     messages: [
       {
@@ -77,7 +78,14 @@ export const getTestContent = async (
         content: prompt,
       },
     ],
-  });
+  } as ICompletionRequest;
+};
+
+export const getTestContent = async (
+  completionRequest: ICompletionRequest,
+  openai: OpenAIApi
+) => {
+  const response = await openai.createChatCompletion(completionRequest);
 
   // remove lines that start with ``` (markdown code block)
   const regex = /^```.*$/gm;
@@ -113,7 +121,9 @@ export const autoTest = async ({
 
   console.log(chalk.blue("Generating tests..."));
 
+  const openai = await initOpenAI(apiKey);
   const prompt = getPrompt(content, techs, tips);
-  const testContent = await getTestContent(prompt, apiKey, model);
+  const completionRequest = getCompletionRequest(model, prompt);
+  const testContent = await getTestContent(completionRequest, openai);
   writeToFile(outputFile, testContent);
 };
