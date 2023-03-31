@@ -1,7 +1,8 @@
 import chalk from "chalk";
 import fs from "fs";
 import { Configuration, CreateChatCompletionRequest, OpenAIApi } from "openai";
-import { parse, stringify } from "yaml";
+import { parse } from "yaml";
+import { ERole, IGuide, IMessage, iGetPromptArgs } from "./types";
 
 export const readFile = (path: string) => {
   try {
@@ -21,13 +22,6 @@ export const writeToFile = (path: string, content: string) => {
     console.error(`Error writing to file: ${err}`);
   }
 };
-
-export interface iGetPromptArgs {
-  content: string;
-  fileName: string;
-  techs?: string[];
-  tips?: string[];
-}
 
 export const toList = (arr: string[]) =>
   arr.map((tip, index) => `${index + 1}. ${tip}`).join("\r\n");
@@ -64,12 +58,6 @@ export const getPrompt = ({
   return prompt;
 };
 
-export interface IGuide {
-  fileName: string;
-  code: string;
-  tests: string;
-}
-
 export const getExamples = (promptArgs: iGetPromptArgs, guide?: IGuide[]) => {
   if (!guide) {
     return [];
@@ -85,11 +73,11 @@ export const getExamples = (promptArgs: iGetPromptArgs, guide?: IGuide[]) => {
 
       return [
         {
-          role: "user",
+          role: ERole.User,
           content: prompt,
         },
         {
-          role: "assistant",
+          role: ERole.Assistant,
           content: g.tests,
         },
       ];
@@ -118,11 +106,6 @@ export const initOpenAI = async (apiKey: string) => {
 
 export type ICompletionRequest = CreateChatCompletionRequest;
 
-interface IMessage {
-  role: "user" | "system" | "assistant";
-  content: string;
-}
-
 export const getCompletionRequest = (
   model: IModel,
   prompt: string,
@@ -132,13 +115,13 @@ export const getCompletionRequest = (
     model,
     messages: [
       {
-        role: "system",
+        role: ERole.System,
         content:
           "You are an assistant that provides unit tests for a given file.",
       },
       ...examples,
       {
-        role: "user",
+        role: ERole.User,
         content: prompt,
       },
     ],
