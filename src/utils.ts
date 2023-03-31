@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import fs from "fs";
 import { Configuration, CreateChatCompletionRequest, OpenAIApi } from "openai";
+import { parse, stringify } from "yaml";
 
 export const readFile = (path: string) => {
   try {
@@ -63,9 +64,9 @@ export const getPrompt = ({
   return prompt;
 };
 
-export const readJsonFile = (path: string) => {
+export const readYamlFile = (path: string) => {
   const content = readFile(path);
-  return JSON.parse(content);
+  return parse(content);
 };
 
 export type IModel = "gpt-3.5-turbo" | "gpt-3.5-turbo-0301" | "gpt-4";
