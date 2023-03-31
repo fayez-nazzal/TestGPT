@@ -21,27 +21,44 @@ export const writeToFile = (path: string, content: string) => {
   }
 };
 
-export const getPrompt = (
-  content: string,
-  techs?: string[],
-  tips?: string[]
-) => {
-  let prompt = "Please write unit tests for the following file given";
+export interface iGetPromptArgs {
+  content: string;
+  fileName: string;
+  techs?: string[];
+  tips?: string[];
+}
+
+export const toList = (arr: string[]) =>
+  arr.map((tip, index) => `${index + 1}. ${tip}`).join("\r\n");
+
+export const getPrompt = ({
+  content,
+  fileName,
+  techs,
+  tips,
+}: iGetPromptArgs) => {
+  let prompt = `I need unit tests for a file called ${fileName}`;
 
   if (techs?.length) {
-    prompt += " using the following technologies";
-    prompt += techs.join(", ");
+    prompt += ` using the following technologies: 
+      ${toList(techs)}
+    `;
   }
 
   if (tips?.length) {
-    prompt += " and the following tips";
-    prompt += tips.join(", ");
+    prompt += `Here are some tips: 
+      ${toList(tips)}
+    `;
   }
 
   prompt +=
-    'Please only give the code directly, without any additional text, without any additional details, your answer should be only the code block of the unit tests without anything else, don\'t tell anything like "Here are the unit tests", just answer with the code block.';
+    "Your answer should be only the code block. Start your response it with ``` and end it with ```";
 
-  prompt += content;
+  prompt += `Here is the file content: 
+    \`\`\`
+    ${content}
+    \`\`\`
+  `;
 
   return prompt;
 };
@@ -122,7 +139,14 @@ export const autoTest = async ({
   console.log(chalk.blue("Generating tests..."));
 
   const openai = await initOpenAI(apiKey);
-  const prompt = getPrompt(content, techs, tips);
+
+  // ROW ROW FIGHT THE POWER
+  const prompt = getPrompt({
+    content,
+    fileName: inputFile,
+    techs,
+    tips,
+  });
   const completionRequest = getCompletionRequest(model, prompt);
   const testContent = await getTestContent(completionRequest, openai);
   writeToFile(outputFile, testContent);

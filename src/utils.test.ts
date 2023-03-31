@@ -50,8 +50,9 @@ describe("getPrompt", () => {
     const content = `const greetings = "Hello!"`;
     const techs = ["jest"];
     const tips = ["use 2 spaces for indentation"];
+    const fileName = "test.js";
 
-    const prompt = getPrompt(content, techs, tips);
+    const prompt = getPrompt({ fileName, content, techs, tips });
 
     for (const tech of techs) {
       expect(prompt).toContain(tech);
@@ -62,5 +63,6 @@ describe("getPrompt", () => {
     }
 
     expect(prompt).toContain(content);
+    expect(prompt).toContain(fileName);
   });
 });
