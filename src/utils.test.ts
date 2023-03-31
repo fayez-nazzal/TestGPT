@@ -1,68 +1,207 @@
+import {
+  readFile,
+  writeToFile,
+  getPrompt,
+  toList,
+  getExamples,
+  readYamlFile,
+  initOpenAI,
+  getCompletionRequest,
+  getTestContent,
+  autoTest,
+} from "./utils";
 import fs from "fs";
-import { readFile, writeToFile, getPrompt } from "./utils";
+import { Configuration, OpenAIApi } from "openai";
+import { parse } from "yaml";
+import chalk from "chalk";
 
-// mock chalk
 jest.mock("chalk", () => ({
-  // es module export
-  __esModule: true,
-  default: {
-    blue: jest.fn((text) => text),
-    red: jest.fn((text) => text),
-    green: jest.fn((text) => text),
-  },
+  blue: jest.fn((text) => text),
+  green: jest.fn((text) => text),
+  red: jest.fn((text) => text),
 }));
 
-// Unit Tests
-describe("readFile", () => {
-  it("should return the content of a file", () => {
-    const path = "./test.txt";
-    const expectedContent = "This is a test file";
+jest.mock("fs", () => ({
+  readFileSync: jest.fn(),
+  writeFileSync: jest.fn(),
+}));
 
-    fs.writeFileSync(path, expectedContent);
+jest.mock("axios", () => ({
+  get: jest.fn(),
+}));
 
-    expect(readFile(path)).toBe(expectedContent);
+jest.mock("openai", () => ({
+  Configuration: jest.fn(),
+  OpenAIApi: jest.fn(),
+}));
 
-    fs.unlinkSync(path);
+(global as any).fetch = jest.fn();
+
+jest.mock("fs", () => ({
+  readFileSync: jest.fn(),
+  writeFileSync: jest.fn(),
+}));
+
+describe("utils", () => {
+  describe("readFile", () => {
+    it("should read content from file", () => {
+      (global as any).fetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          json: () => Promise.resolve({ message: { bulldog: [], poodle: [] } }),
+        })
+      );
+
+      (fs.readFileSync as jest.Mock).mockImplementation(() => "some content");
+
+      const result = readFile("path/to/file");
+      expect(result).toEqual("some content");
+    });
+
+    it("should return an empty string if read fails", () => {
+      (fs.readFileSync as jest.Mock).mockImplementation(() => {
+        throw new Error("error");
+      });
+
+      const result = readFile("path/to/file");
+      expect(result).toEqual("");
+    });
   });
 
-  it("should return an empty string if an error occurs", () => {
-    const path = "./invalid-file.txt";
-
-    expect(readFile(path)).toBe("");
+  describe("writeToFile", () => {
+    it("should write content to file", () => {
+      writeToFile("path/to/file", "file content");
+      expect(fs.writeFileSync).toHaveBeenCalledWith(
+        "path/to/file",
+        "file content"
+      );
+      expect(chalk.green).toHaveBeenCalledWith(
+        "Successfully wrote to file: path/to/file"
+      );
+    });
   });
-});
 
-describe("writeToFile", () => {
-  it("should write content to a file", () => {
-    const path = "./test.txt";
-    const content = "This is a test file";
+  describe("getPrompt", () => {
+    it("should generate prompt without techs and tips", () => {
+      const result = getPrompt({
+        content: "file content",
+        fileName: "file.ts",
+      });
 
-    writeToFile(path, content);
+      expect(result).toContain("I need unit tests for a file called file.ts");
+      expect(result).not.toContain("using the following technologies");
+      expect(result).not.toContain("Here are some tips");
+    });
 
-    expect(fs.readFileSync(path, "utf-8")).toBe(content);
+    it("should generate prompt with techs and tips", () => {
+      const result = getPrompt({
+        content: "file content",
+        fileName: "file.ts",
+        techs: ["jest"],
+        tips: ["use 2 spaces for indentation"],
+      });
 
-    fs.unlinkSync(path);
+      expect(result).toContain("file content");
+      expect(result).toContain("file.ts");
+      expect(result).toContain("jest");
+      expect(result).toContain("use 2 spaces for indentation");
+    });
   });
-});
 
-describe("getPrompt", () => {
-  it("should return the correct prompt with the given parameters", () => {
-    const content = `const greetings = "Hello!"`;
-    const techs = ["jest"];
-    const tips = ["use 2 spaces for indentation"];
-    const fileName = "test.js";
+  describe("toList", () => {
+    it("should convert array to list", () => {
+      const result = toList(["tip1", "tip2"]);
+      expect(result).toEqual("1. tip1\r\n2. tip2");
+    });
+  });
 
-    const prompt = getPrompt({ fileName, content, techs, tips });
+  describe("getExamples", () => {
+    it("should generate examples from guide", () => {
+      const guide = [
+        {
+          fileName: "file1.ts",
+          code: "file 1 content",
+          tests: "file 1 tests",
+        },
+      ];
 
-    for (const tech of techs) {
-      expect(prompt).toContain(tech);
-    }
+      const result = getExamples(
+        {
+          content: "file content",
+          fileName: "file.ts",
+          techs: ["jest"],
+          tips: ["use 2 spaces for indentation"],
+        },
+        guide
+      );
 
-    for (const tip of tips) {
-      expect(prompt).toContain(tip);
-    }
+      expect(result).toHaveLength(2);
+      expect(result[0].role).toEqual("user");
+      expect(result[0].content).toContain("file content");
+      expect(result[1].role).toEqual("assistant");
+      expect(result[1].content).toContain("file 1 tests");
+    });
 
-    expect(prompt).toContain(content);
-    expect(prompt).toContain(fileName);
+    it("should not generate examples when there is no guide", () => {
+      const result = getExamples({
+        content: "file content",
+        fileName: "file.ts",
+        techs: ["jest"],
+        tips: ["use 2 spaces for indentation"],
+      });
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("readYamlFile", () => {
+    it("should read yaml file and parse to object", () => {
+      (fs.readFileSync as jest.Mock).mockReturnValue("name: John");
+
+      const result = readYamlFile("path/to/file");
+      expect(result).toEqual({ name: "John" });
+    });
+  });
+
+  describe("initOpenAI", () => {
+    it("should initialize openai with given api key", async () => {
+      const configuration = { apiKey: "api_key" };
+
+      (Configuration as jest.Mock).mockImplementationOnce(() => {
+        return configuration;
+      });
+
+      await initOpenAI("api_key");
+      expect(OpenAIApi).toHaveBeenCalledWith(configuration);
+    });
+  });
+
+  describe("getCompletionRequest", () => {
+    it("should generate completion request", () => {
+      const prompt = "prompt text";
+      const examples = [
+        {
+          role: "user" as "user",
+          content: "test prompt",
+        },
+      ];
+
+      const result = getCompletionRequest("gpt-4", prompt, examples);
+
+      expect(result).toEqual({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are an assistant that provides unit tests for a given file.",
+          },
+          ...examples,
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      });
+    });
   });
 });

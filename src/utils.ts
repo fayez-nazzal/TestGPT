@@ -64,6 +64,41 @@ export const getPrompt = ({
   return prompt;
 };
 
+export interface IGuide {
+  fileName: string;
+  code: string;
+  tests: string;
+}
+
+export const getExamples = (promptArgs: iGetPromptArgs, guide?: IGuide[]) => {
+  if (!guide) {
+    return [];
+  }
+
+  const examples = guide
+    .map((g) => {
+      const prompt = getPrompt({
+        ...promptArgs,
+        content: g.code,
+        fileName: g.fileName,
+      });
+
+      return [
+        {
+          role: "user",
+          content: prompt,
+        },
+        {
+          role: "assistant",
+          content: g.tests,
+        },
+      ];
+    })
+    .flat();
+
+  return examples as IMessage[];
+};
+
 export const readYamlFile = (path: string) => {
   const content = readFile(path);
   return parse(content);
@@ -83,14 +118,25 @@ export const initOpenAI = async (apiKey: string) => {
 
 export type ICompletionRequest = CreateChatCompletionRequest;
 
-export const getCompletionRequest = (model: IModel, prompt: string) => {
+interface IMessage {
+  role: "user" | "system" | "assistant";
+  content: string;
+}
+
+export const getCompletionRequest = (
+  model: IModel,
+  prompt: string,
+  examples: IMessage[]
+) => {
   return {
     model,
     messages: [
       {
         role: "system",
-        content: "You are a unit test generator.",
+        content:
+          "You are an assistant that provides unit tests for a given file.",
       },
+      ...examples,
       {
         role: "user",
         content: prompt,
@@ -115,6 +161,7 @@ interface IAutoTestArgs {
   outputFile: string;
   apiKey: string;
   model: IModel;
+  guide?: IGuide[];
   techs?: string[];
   tips?: string[];
 }
@@ -124,6 +171,7 @@ export const autoTest = async ({
   outputFile,
   apiKey,
   model,
+  guide,
   techs,
   tips,
 }: IAutoTestArgs) => {
@@ -141,14 +189,16 @@ export const autoTest = async ({
 
   const openai = await initOpenAI(apiKey);
 
-  // ROW ROW FIGHT THE POWER
-  const prompt = getPrompt({
+  const promptArgs = {
     content,
     fileName: inputFile,
     techs,
     tips,
-  });
-  const completionRequest = getCompletionRequest(model, prompt);
+  };
+
+  const prompt = getPrompt(promptArgs);
+  const examples = getExamples(promptArgs, guide);
+  const completionRequest = getCompletionRequest(model, prompt, examples);
   const testContent = await getTestContent(completionRequest, openai);
   writeToFile(outputFile, testContent);
 };

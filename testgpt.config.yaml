@@ -1,0 +1,165 @@
+.ts:
+  techs:
+    - jest
+  tips:
+    - use 2 spaces for indentation
+    - wrap each group of tests in a describe block
+    - Don't forget to import the things you need.
+  guide:
+    - fileName: array_utils.test.ts
+      code: |
+        export const addItem = (array: any[], item: any) => {
+          return [...array, item];
+        };
+
+        export const removeItem = (array: any[], item: any) => {
+          return array.filter((i) => i !== item);
+        };
+
+        export const toggleItem = (array: any[], item: any) => {
+          return array.includes(item) ? removeItem(array, item) : addItem(array, item);
+        };
+
+        export const toggleItemInArray = (array: any[], item: any) => {
+          return array.includes(item) ? removeItem(array, item) : addItem(array, item);
+        };
+      tests: |
+        import {
+          addItem,
+          removeItem,
+          toggleItem,
+          toggleItemInArray,
+        } from "./array_utils";
+
+        describe("array_utils", () => {
+          it("should add item to the array", () => {
+            const array = ["item1", "item2"];
+            const itemToAdd = "item3";
+
+            expect(addItem(array, itemToAdd)).toEqual([...array, itemToAdd]);
+          });
+
+          describe("removeItem", () => {
+            it("should remove item from the array", () => {
+              const array = ["item1", "item2", "item3"];
+              const itemToRemove = "item2";
+
+              expect(removeItem(array, itemToRemove)).toEqual(["item1", "item3"]);
+            });
+          });
+
+          describe("toggleItem", () => {
+            it("should remove the item if it already exists in the array", () => {
+              const array = ["item1", "item2"];
+              const itemToToggle = "item2";
+
+              expect(toggleItem(array, itemToToggle)).toEqual(["item1"]);
+            });
+
+            it("should add the item if it doesn't exist in the array", () => {
+              const array = ["item1", "item2"];
+              const itemToToggle = "item3";
+
+              expect(toggleItem(array, itemToToggle)).toEqual([...array, itemToToggle]);
+            });
+          });
+
+          describe("toggleItemInArray", () => {
+            it("should remove the item if it already exists in the array", () => {
+              const array = ["item1", "item2"];
+              const itemToToggle = "item2";
+
+              expect(toggleItemInArray(array, itemToToggle)).toEqual(["item1"]);
+            });
+
+            it("should add the item if it doesn't exist in the array", () => {
+              const array = ["item1", "item2"];
+              const itemToToggle = "item3";
+
+              expect(toggleItemInArray(array, itemToToggle)).toEqual([
+                ...array,
+                itemToToggle,
+              ]);
+            });
+          });
+        });
+    - fileName: data.ts
+      code: |
+        import axios from "axios";
+        import chalk from "chalk";
+
+        export const fetchDogNames = async () => {
+          console.log(chalk.blue("Fetching dog names..."));
+          const response = await fetch("https://dog.ceo/api/breeds/list/all");
+          const data = await response.json();
+          return Object.keys(data.message);
+        };
+
+        export const fetchCatNames = async () => {
+          console.log(chalk.blue("Fetching cat names..."));
+          const response = await axios.get("https://api.thecatapi.com/v1/breeds");
+          return response.data.map((cat: any) => cat.name);
+        };
+
+        export const fetchDogImage = async (breed: string) => {
+          console.log(chalk.green(`Fetching ${breed} image...`));
+          const response = await fetch(
+            `https://dog.ceo/api/breed/${breed}/images/random`
+          );
+          const data = await response.json();
+          return data.message;
+        };
+      tests: |
+          import axios from "axios";
+          import { fetchDogImage, fetchCatNames, fetchDogNames } from "./data";
+
+          jest.mock("chalk", () => ({
+            blue: jest.fn((text) => text),
+            green: jest.fn((text) => text),
+          }));
+
+          (global as any).fetch = jest.fn();
+
+          jest.mock("axios", () => ({
+            get: jest.fn(),
+          }));
+
+          describe("data", () => {
+            it("should fetch dog names", async () => {
+              (global as any).fetch.mockImplementationOnce(() =>
+                Promise.resolve({
+                  json: () => Promise.resolve({ message: { bulldog: [], poodle: [] } }),
+                })
+              );
+
+              const dogNames = await fetchDogNames();
+              expect(dogNames).toEqual(["bulldog", "poodle"]);
+            });
+
+            it("should fetch cat names", async () => {
+              (axios.get as jest.Mock).mockImplementationOnce(() =>
+                Promise.resolve({
+                  data: [{ name: "catie" }, { name: "kitty" }],
+                })
+              );
+
+              const catNames = await fetchCatNames();
+              expect(catNames).toEqual(["catie", "kitty"]);
+            });
+
+            it("should fetch dog image", async () => {
+              const link = "https://dog.ceo/api/breed/bulldog/images/random";
+
+              (global as any).fetch.mockImplementationOnce(() =>
+                Promise.resolve({
+                  json: () =>
+                    Promise.resolve({
+                      message: link,
+                    }),
+                })
+              );
+
+              const dogImage = await fetchDogImage("bulldog");
+              expect(dogImage).toEqual(link);
+            });
+          });
