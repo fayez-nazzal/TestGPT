@@ -2,7 +2,7 @@
 import chalk from "chalk";
 import { program } from "commander";
 import { CONFIG_FILE_NAME, DEFAULT_MODEL } from "./const.js";
-import { readJsonFile, autoTest } from "./utils.js";
+import { readYamlFile, autoTest } from "./utils.js";
 import path from "path";
 import fs from "fs";
 
@@ -18,10 +18,17 @@ program
 
 program.parse();
 
+interface IGuide {
+  fileName: string;
+  code: string;
+  tests: string;
+}
+
 interface IConfig {
   [key: `.${string}`]: {
     techs: string[];
     tips: string[];
+    guide: IGuide[];
   };
 }
 
@@ -62,7 +69,7 @@ console.log(chalk.blue(`inputFile extension: ${inputFileExtension}`));
 const configFilePath = path.join(process.cwd(), `${CONFIG_FILE_NAME}`);
 
 if (fs.existsSync(configFilePath)) {
-  config = readJsonFile(
+  config = readYamlFile(
     options.config || path.join(process.cwd(), `${CONFIG_FILE_NAME}`)
   );
 } else {
@@ -73,6 +80,7 @@ if (fs.existsSync(configFilePath)) {
       [inputFileExtension]: {
         techs: options.techs?.split(",") || [],
         tips: options.tips?.split(",") || [],
+        guide: [],
       },
     };
   } else {
@@ -94,9 +102,9 @@ if (!outputFile) {
 
 const techs = config?.[inputFileExtension]?.techs;
 const tips = config?.[inputFileExtension]?.tips || [];
+const guide = config?.[inputFileExtension]?.guide;
 
 const apiKey = process.env.OPENAI_API_KEY || options.apiKey;
-
 const model = options.model || DEFAULT_MODEL;
 
 autoTest({
