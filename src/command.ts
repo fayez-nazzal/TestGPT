@@ -50,7 +50,7 @@ export const executeCommand = ({
   model,
   techs,
   tips,
-  guide,
+  examples,
   config,
   help,
 }: ICommandArgs) => {
@@ -98,11 +98,13 @@ export const executeCommand = ({
         [inputFileExtension]: {
           techs: techs?.split(",") || [],
           tips: tips?.split(",") || [],
-          guide: [],
+          examples: [],
         },
       };
     } else {
-      console.log(chalk.blue(`Config file not found, continuing with default config`));
+      console.log(
+        chalk.blue(`Config file not found, continuing with default config`)
+      );
     }
   }
 
@@ -118,7 +120,7 @@ export const executeCommand = ({
 
   const parsedTechs = testGPTConfig?.[inputFileExtension]?.techs;
   const parsedTips = testGPTConfig?.[inputFileExtension]?.tips;
-  guide ??= testGPTConfig?.[inputFileExtension]?.guide;
+  examples ??= testGPTConfig?.[inputFileExtension]?.examples;
   apiKey ??= process.env.OPENAI_API_KEY;
   model ??= DEFAULT_MODEL;
 
@@ -127,9 +129,9 @@ export const executeCommand = ({
     outputFile,
     apiKey,
     model: model as IModel,
-    guide,
+    examples,
     techs: parsedTechs,
     tips: parsedTips,
   });
-}
+};
 

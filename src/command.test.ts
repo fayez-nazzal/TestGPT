@@ -5,7 +5,7 @@ import chalk from "chalk";
 import { parseCommand, executeCommand } from "./command";
 import { CONFIG_FILE_NAME } from "./const";
 import { readYamlFile } from "./utils";
-import { IGuide } from "./types";
+import { IExample } from "./types";
 
 jest.mock("fs");
 jest.mock("path");
@@ -13,9 +13,9 @@ jest.mock("commander");
 jest.mock("chalk", () => ({
   green: jest.fn(),
   blue: jest.fn(),
-  yellow: jest.fn()
+  yellow: jest.fn(),
 }));
-jest.mock('./utils');
+jest.mock("./utils");
 
 (global as any).console = {
   log: jest.fn(),
@@ -24,7 +24,7 @@ jest.mock('./utils');
 
 (global as any).process = {
   exit: jest.fn(),
-  cwd: jest.fn()
+  cwd: jest.fn(),
 };
 
 describe("command", () => {
@@ -41,7 +41,7 @@ describe("command", () => {
       techs: "JS,TS",
       tips: "good,bad",
       config: "test.yaml",
-      guide: [],
+      example: [],
       help: false,
     };
 
@@ -56,7 +56,7 @@ describe("command", () => {
       const mockExistsSync = jest.fn();
       mockExistsSync.mockReturnValue(false);
       (fs.existsSync as jest.Mock).mockImplementationOnce(mockExistsSync);
-      (console.log as jest.Mock).mockImplementation(() => { });
+      (console.log as jest.Mock).mockImplementation(() => {});
       (path.join as jest.Mock).mockReturnValue(CONFIG_FILE_NAME);
       (readYamlFile as jest.Mock).mockReturnValueOnce({});
 
@@ -73,7 +73,7 @@ describe("command", () => {
       const mockExistsSync = jest.fn();
       mockExistsSync.mockReturnValue(false);
       (fs.existsSync as jest.Mock).mockImplementationOnce(mockExistsSync);
-      (console.log as jest.Mock).mockImplementation(() => { });
+      (console.log as jest.Mock).mockImplementation(() => {});
       (path.join as jest.Mock).mockReturnValue(CONFIG_FILE_NAME);
       (readYamlFile as jest.Mock).mockReturnValueOnce({});
 
@@ -88,8 +88,8 @@ describe("command", () => {
       const mockExistsSync = jest.fn();
       mockExistsSync.mockReturnValue(true);
       (fs.existsSync as jest.Mock).mockImplementationOnce(mockExistsSync);
-      (console.log as jest.Mock).mockImplementationOnce(() => { });
-      (console.log as jest.Mock).mockImplementationOnce(() => { });
+      (console.log as jest.Mock).mockImplementationOnce(() => {});
+      (console.log as jest.Mock).mockImplementationOnce(() => {});
       (path.join as jest.Mock).mockReturnValue(CONFIG_FILE_NAME);
       (readYamlFile as jest.Mock).mockReturnValueOnce({});
 
@@ -99,15 +99,15 @@ describe("command", () => {
       expect(readYamlFile).toHaveBeenCalledTimes(1);
     });
 
-    it("should use passed guide when guide not provided in config", () => {
+    it("should use passed example when example not provided in config", () => {
       const mockExistsSync = jest.fn();
       mockExistsSync.mockReturnValue(false);
       (fs.existsSync as jest.Mock).mockImplementationOnce(mockExistsSync);
-      (console.log as jest.Mock).mockImplementationOnce(() => { });
+      (console.log as jest.Mock).mockImplementationOnce(() => {});
       (path.join as jest.Mock).mockReturnValue(CONFIG_FILE_NAME);
       (readYamlFile as jest.Mock).mockReturnValueOnce({});
 
-      executeCommand({ ...mockArgs, guide: ["step1", "step2"] });
+      executeCommand({ ...mockArgs, example: ["step1", "step2"] });
 
       expect(fs.existsSync).toHaveBeenCalledTimes(1);
       expect(readYamlFile).not.toHaveBeenCalled();
@@ -118,8 +118,8 @@ describe("command", () => {
       const mockExistsSync = jest.fn();
       mockExistsSync.mockReturnValue(false);
       (fs.existsSync as jest.Mock).mockImplementationOnce(mockExistsSync);
-      (console.log as jest.Mock).mockImplementationOnce(() => { });
-      (console.log as jest.Mock).mockImplementationOnce(() => { });
+      (console.log as jest.Mock).mockImplementationOnce(() => {});
+      (console.log as jest.Mock).mockImplementationOnce(() => {});
       (path.join as jest.Mock).mockReturnValue(CONFIG_FILE_NAME);
       (readYamlFile as jest.Mock).mockReturnValueOnce({});
 
@@ -139,8 +139,8 @@ describe("command", () => {
       const mockExistsSync = jest.fn(() => false);
       mockExistsSync.mockReturnValue(false);
       (fs.existsSync as jest.Mock).mockImplementationOnce(mockExistsSync);
-      (console.log as jest.Mock).mockImplementationOnce(() => { });
-      (console.log as jest.Mock).mockImplementationOnce(() => { });
+      (console.log as jest.Mock).mockImplementationOnce(() => {});
+      (console.log as jest.Mock).mockImplementationOnce(() => {});
       (path.join as jest.Mock).mockReturnValue(CONFIG_FILE_NAME);
       (readYamlFile as jest.Mock).mockReturnValueOnce({});
 
@@ -157,8 +157,8 @@ describe("command", () => {
       const mockExistsSync = jest.fn(() => false);
       mockExistsSync.mockReturnValue(false);
       (fs.existsSync as jest.Mock).mockImplementationOnce(mockExistsSync);
-      (console.log as jest.Mock).mockImplementationOnce(() => { });
-      (console.log as jest.Mock).mockImplementationOnce(() => { });
+      (console.log as jest.Mock).mockImplementationOnce(() => {});
+      (console.log as jest.Mock).mockImplementationOnce(() => {});
       (path.join as jest.Mock).mockReturnValue(CONFIG_FILE_NAME);
       (readYamlFile as jest.Mock).mockReturnValueOnce({});
 

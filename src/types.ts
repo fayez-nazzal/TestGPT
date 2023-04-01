@@ -2,7 +2,7 @@ export interface IConfig {
   [key: `.${string}`]: {
     techs: string[];
     tips: string[];
-    guide: IGuide[];
+    examples: IExample[];
   };
 }
 
@@ -13,7 +13,7 @@ export interface iGetPromptArgs {
   tips?: string[];
 }
 
-export interface IGuide {
+export interface IExample {
   fileName: string;
   code: string;
   tests: string;
@@ -37,7 +37,7 @@ export interface ICommandArgs {
   model: string;
   techs: string;
   tips: string;
-  guide: IGuide[];
+  examples: IExample[];
   config: string;
   help: boolean;
 }
