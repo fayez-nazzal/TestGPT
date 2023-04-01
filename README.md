@@ -6,6 +6,8 @@ A command-line tool for generating unit tests for your files automatically using
 
 > Now there is a VScode extension the process even faster, check the extension [here](https://marketplace.visualstudio.com/items?itemName=FayezNazzal.testgpt) (You have to install the latest version of testgpt for it to work)
 
+> NOTE: From version 3.0.0 and upwards, `testgpt.config.json` was replaced with `testgpt.config.yaml`, and a new custom property (`examples`) is added.
+
 <br />
 
 <div align="center">
@@ -58,7 +60,7 @@ To use TestGPT, follow these steps:
    - **Windows:** Go to System -> Settings -> Advanced -> Environment Variables, click New under System Variables, and create a new entry with the key `OPENAI_API_KEY` and your OpenAI API Key as the value.
    
 
-3. If you have `testgpt.config.json` you can  **Generate** unit tests by running this command from your project's root directory (where testgpt.config.json is located):
+3. If you have `testgpt.config.yaml` you can  **Generate** unit tests by running this command from your project's root directory (where testgpt.config.yaml is located):
 
    ```zsh
    testgpt -i <path to your input file> -o <path to your test output file>
@@ -73,30 +75,29 @@ To use TestGPT, follow these steps:
 
 ## Providing custom techs using a config file
 
-You can create a `testgpt.config.json` file in your project's root directory to specify technologies and tips for each file extension. Example:
+You can create a `testgpt.config.yaml` file in your project's root directory to specify technologies and tips for each file extension. Example:
 
-   ```json
-   {
-     ".ts": {
-       "techs": ["jest"],
-       "tips": [
-         "use 2 spaces for indentation",
-         "wrap each group of tests in a describe block",
-         "Don't forget to import the things you need."
-       ]
-     },
-     ".tsx": {
-       "techs": ["jest", "react-testing-library", "userEvent"],
-       "tips": [
-         "use 2 spaces for indentation",
-         "use screen",
-         "wrap each group of tests in a describe block",
-         "when using user event, use an async function and await the user event",
-         "prefer not to use getByTestId",
-         "Don't forget to import the things you need."
-       ]
-     }
-   }
+```yaml
+.ts:
+  techs:
+    - jest
+  tips:
+    - use 2 spaces for indentation
+    - wrap each group of tests in a describe block
+    - Don't forget to import the things you need.
+
+.tsx:
+  techs:
+    - jest
+    - react-testing-library
+    - userEvent
+  tips:
+    - use 2 spaces for indentation
+    - use screen
+    - wrap each group of tests in a describe block
+    - when using user event, use an async function and await the user event
+    - prefer not to use getByTestId
+    - Don't forget to import the things you need.
 ```
 
 Then you can run the following command from the same directory as the config file:
@@ -108,12 +109,32 @@ testgpt -i ./src/component.tsx
 You can also pass the `config` file path using the `--config`/`-c` argument.
 
 ```zsh
-testgpt -i ./src/component.tsx -c `./testgpt.config.json`
+testgpt -i ./src/component.tsx -c `./testgpt.config.yaml`
+```
+
+## Providing examples/examples to TestGPT
+
+The file `testgpt.config.yaml` supports the `examples` property for each file extension:
+
+```yaml
+.tsx
+   techs:
+      - jest
+      - react-testing-library
+   tips:
+      - wrap each group of tests in a describe block
+   examples:
+      - fileName: file1.tsx
+        code: <code content for file1.tsx>
+        tests: <tests content for file1.tsx>
+      - fileName: file2.tsx
+        code: <code content for file2.tsx>
+        tests: <tests content for file2.tsx>
 ```
 
 ## Providing custom techs directly
 
-   You can pass `--techs`/`-t` and `--tips`/`-p` directly inside each comman
+   You can pass `--techs`/`-t` and `--tips`/`-p` directly for each command
 
    ```zsh
    testgpt -i ./src/component.tsx --techs react,jest --tips "Don't forget to import what you need"`
