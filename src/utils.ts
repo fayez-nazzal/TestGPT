@@ -47,7 +47,7 @@ export const getPrompt = ({
   }
 
   prompt +=
-    "Your answer should be only the code block. Start your response it with ``` and end it with ```";
+    "Your answer should be only the code block. Start your response with ``` directly and end it with ``` only, don't add any more text.";
 
   prompt += `Here is the file content: 
     \`\`\`
