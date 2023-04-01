@@ -4,4 +4,11 @@ module.exports = {
   testEnvironment: "node",
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
   transformIgnorePatterns: ["//node_modules"],
+  globals: {
+    'ts-jest': {
+      diagnostics: {
+        exclude: ['**'],
+      },
+    },
+  }
 };

@@ -29,3 +29,15 @@ export interface IMessage {
   role: ERole;
   content: string;
 }
+
+export interface ICommandArgs {
+  inputFile: string;
+  outputFile: string;
+  apiKey: string;
+  model: string;
+  techs: string;
+  tips: string;
+  guide: IGuide[];
+  config: string;
+  help: boolean;
+}
