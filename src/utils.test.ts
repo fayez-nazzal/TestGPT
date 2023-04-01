@@ -3,7 +3,7 @@ import {
   writeToFile,
   getPrompt,
   toList,
-  getExamples,
+  getExampleMessages,
   readYamlFile,
   initOpenAI,
   getCompletionRequest,
@@ -112,9 +112,9 @@ describe("utils", () => {
     });
   });
 
-  describe("getExamples", () => {
-    it("should generate examples from guide", () => {
-      const guide = [
+  describe("getExampleMessages", () => {
+    it("should generate examples from example", () => {
+      const example = [
         {
           fileName: "file1.ts",
           code: "file 1 content",
@@ -122,14 +122,14 @@ describe("utils", () => {
         },
       ];
 
-      const result = getExamples(
+      const result = getExampleMessages(
         {
           content: "file content",
           fileName: "file.ts",
           techs: ["jest"],
           tips: ["use 2 spaces for indentation"],
         },
-        guide
+        example
       );
 
       expect(result).toHaveLength(2);
@@ -139,8 +139,8 @@ describe("utils", () => {
       expect(result[1].content).toContain("file 1 tests");
     });
 
-    it("should not generate examples when there is no guide", () => {
-      const result = getExamples({
+    it("should not generate examples when there is no example", () => {
+      const result = getExampleMessages({
         content: "file content",
         fileName: "file.ts",
         techs: ["jest"],

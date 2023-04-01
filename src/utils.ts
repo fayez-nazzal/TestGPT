@@ -2,7 +2,7 @@ import chalk from "chalk";
 import fs from "fs";
 import { Configuration, CreateChatCompletionRequest, OpenAIApi } from "openai";
 import { parse } from "yaml";
-import { ERole, IGuide, IMessage, iGetPromptArgs } from "./types";
+import { ERole, IExample, IMessage, iGetPromptArgs } from "./types";
 
 export const readFile = (path: string) => {
   try {
@@ -58,12 +58,15 @@ export const getPrompt = ({
   return prompt;
 };
 
-export const getExamples = (promptArgs: iGetPromptArgs, guide?: IGuide[]) => {
-  if (!guide) {
+export const getExampleMessages = (
+  promptArgs: iGetPromptArgs,
+  examples?: IExample[]
+) => {
+  if (!examples) {
     return [];
   }
 
-  const examples = guide
+  const messages = examples
     .map((g) => {
       const prompt = getPrompt({
         ...promptArgs,
@@ -84,7 +87,7 @@ export const getExamples = (promptArgs: iGetPromptArgs, guide?: IGuide[]) => {
     })
     .flat();
 
-  return examples as IMessage[];
+  return messages as IMessage[];
 };
 
 export const readYamlFile = (path: string) => {
@@ -144,7 +147,7 @@ interface IAutoTestArgs {
   outputFile: string;
   apiKey: string;
   model: IModel;
-  guide?: IGuide[];
+  examples?: IExample[];
   techs?: string[];
   tips?: string[];
 }
@@ -154,7 +157,7 @@ export const autoTest = async ({
   outputFile,
   apiKey,
   model,
-  guide,
+  examples,
   techs,
   tips,
 }: IAutoTestArgs) => {
@@ -180,8 +183,12 @@ export const autoTest = async ({
   };
 
   const prompt = getPrompt(promptArgs);
-  const examples = getExamples(promptArgs, guide);
-  const completionRequest = getCompletionRequest(model, prompt, examples);
+  const exampleMessages = getExampleMessages(promptArgs, examples);
+  const completionRequest = getCompletionRequest(
+    model,
+    prompt,
+    exampleMessages
+  );
   const testContent = await getTestContent(completionRequest, openai);
   writeToFile(outputFile, testContent);
 };
