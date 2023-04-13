@@ -14,9 +14,15 @@ export const readFile = (path: string) => {
   }
 };
 
-export const writeToFile = (path: string, content: string) => {
+export const writeToFile = (
+  path: string,
+  content: string,
+  append?: boolean
+) => {
   try {
-    fs.writeFileSync(path, content);
+    fs.writeFileSync(path, content, {
+      flag: append ? "a" : "w",
+    });
     console.log(chalk.green(`Successfully wrote to file: ${path}`));
   } catch (err) {
     console.error(`Error writing to file: ${err}`);
@@ -142,6 +148,46 @@ export const getTestContent = async (
   return response.data.choices[0].message.content?.replace(regex, "");
 };
 
+export const streamTestContent = async (
+  completionRequest: ICompletionRequest,
+  openai: OpenAIApi,
+  onToken: (token: string) => void
+) => {
+  const response = await openai.createChatCompletion(
+    {
+      ...completionRequest,
+      stream: true,
+    },
+    {
+      responseType: "stream",
+    }
+  );
+
+  for await (const chunk of (response as any).data) {
+    console.log("inside loop");
+    const lines = chunk
+      .toString("utf8")
+      .split("\n")
+      .filter((line) => line.trim().startsWith("data: "));
+
+    for (const line of lines) {
+      const message = line.replace(/^data: /, "");
+
+      if (message === "[DONE]") {
+        console.log(message);
+        return;
+      }
+
+      const json = JSON.parse(message);
+      const token = json.choices[0].delta.content;
+
+      if (token) {
+        onToken(token);
+      }
+    }
+  }
+};
+
 interface IAutoTestArgs {
   inputFile: string;
   outputFile: string;
@@ -150,6 +196,7 @@ interface IAutoTestArgs {
   examples?: IExample[];
   techs?: string[];
   tips?: string[];
+  stream?: boolean;
 }
 
 export const autoTest = async ({
@@ -160,6 +207,7 @@ export const autoTest = async ({
   examples,
   techs,
   tips,
+  stream,
 }: IAutoTestArgs) => {
   console.log(chalk.blue("Reading input file..."));
 
@@ -189,6 +237,13 @@ export const autoTest = async ({
     prompt,
     exampleMessages
   );
-  const testContent = await getTestContent(completionRequest, openai);
-  writeToFile(outputFile, testContent);
+
+  if (stream) {
+    await streamTestContent(completionRequest, openai, (token) => {
+      writeToFile(outputFile, token, true);
+    });
+  } else {
+    const testContent = await getTestContent(completionRequest, openai);
+    writeToFile(outputFile, testContent);
+  }
 };

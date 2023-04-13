@@ -43,7 +43,7 @@ export const parseCommand = () => {
   return options as ICommandArgs;
 };
 
-export const executeCommand = ({
+export const executeCommand = async ({
   inputFile,
   outputFile,
   apiKey,
@@ -124,7 +124,7 @@ export const executeCommand = ({
   apiKey ??= process.env.OPENAI_API_KEY;
   model ??= DEFAULT_MODEL;
 
-  autoTest({
+  await autoTest({
     inputFile,
     outputFile,
     apiKey,
@@ -133,5 +133,7 @@ export const executeCommand = ({
     techs: parsedTechs,
     tips: parsedTips,
   });
+
+  process.exit(0);
 };
 
