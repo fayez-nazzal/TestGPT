@@ -39,5 +39,6 @@ export interface ICommandArgs {
   tips: string;
   examples: IExample[];
   config: string;
+  stream: boolean;
   help: boolean;
 }

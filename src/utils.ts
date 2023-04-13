@@ -164,7 +164,6 @@ export const streamTestContent = async (
   );
 
   for await (const chunk of (response as any).data) {
-    console.log("inside loop");
     const lines = chunk
       .toString("utf8")
       .split("\n")
@@ -174,7 +173,6 @@ export const streamTestContent = async (
       const message = line.replace(/^data: /, "");
 
       if (message === "[DONE]") {
-        console.log(message);
         return;
       }
 

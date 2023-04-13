@@ -17,6 +17,7 @@ export const parseCommand = () => {
     .option("-t, --techs <char>")
     .option("-p, --tips <char>")
     .option("-c, --config <char>")
+    .option("-s, --stream")
     .option("-h, --help");
 
   program.parse();
@@ -52,6 +53,7 @@ export const executeCommand = async ({
   tips,
   examples,
   config,
+  stream,
   help,
 }: ICommandArgs) => {
   if (help) {
@@ -132,6 +134,7 @@ export const executeCommand = async ({
     examples,
     techs: parsedTechs,
     tips: parsedTips,
+    stream,
   });
 
   process.exit(0);
