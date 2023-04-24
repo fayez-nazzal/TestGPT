@@ -1,5 +1,6 @@
 import chalk from "chalk";
 import fs from "fs";
+import path from "path";
 import { Configuration, CreateChatCompletionRequest, OpenAIApi } from "openai";
 import { parse } from "yaml";
 import { ERole, IExample, IMessage, iGetPromptArgs } from "./types";
@@ -26,6 +27,29 @@ export const writeToFile = (
     console.log(chalk.green(`Successfully wrote to file: ${path}`));
   } catch (err) {
     console.error(`Error writing to file: ${err}`);
+  }
+};
+
+export const divideFileName = (fileName: string) => {
+  const extension = path.extname(fileName);
+  const name = path.basename(fileName, extension);
+
+  return { name, extension };
+};
+
+export enum EFileType {
+  File,
+  Directory,
+}
+
+export const getFileType = (path: string) => {
+  try {
+    const isDirectory = fs.lstatSync(path).isDirectory();
+
+    return isDirectory ? EFileType.Directory : EFileType.File;
+  } catch (err) {
+    console.error(`Error getting file type: ${err}`);
+    return EFileType.File;
   }
 };
 

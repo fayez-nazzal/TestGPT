@@ -6,7 +6,14 @@ import chalk from "chalk";
 
 import { CONFIG_FILE_NAME, DEFAULT_MODEL } from "./const";
 import { ICommandArgs, IConfig } from "./types";
-import { autoTest, IModel, readYamlFile } from "./utils";
+import {
+  autoTest,
+  divideFileName,
+  EFileType,
+  getFileType,
+  IModel,
+  readYamlFile,
+} from "./utils";
 
 export const parseCommand = () => {
   program
@@ -44,18 +51,8 @@ export const parseCommand = () => {
   return options as ICommandArgs;
 };
 
-export const executeCommand = async ({
-  inputFile,
-  outputFile,
-  apiKey,
-  model,
-  techs,
-  tips,
-  examples,
-  config,
-  stream,
-  help,
-}: ICommandArgs) => {
+export const executeCommand = async (args: ICommandArgs) => {
+  const { help, inputFile, outputFile } = args;
   if (help) {
     console.log(
       chalk.blue(
@@ -73,7 +70,58 @@ export const executeCommand = async ({
     process.exit(0);
   }
 
-  let inputFileExtension = path.extname(inputFile);
+  const isInputDirectory = getFileType(inputFile) === EFileType.Directory;
+  const isOutputDirectory =
+    outputFile && getFileType(outputFile) === EFileType.Directory;
+
+  if (isInputDirectory && outputFile && !isOutputDirectory) {
+    console.error(
+      chalk.red(
+        "If inputFile is a directory, outputFile must also be a directory"
+      )
+    );
+    process.exit(1);
+  }
+
+  if (isInputDirectory) {
+    // if outputDirectory is not provided, use the inputDirectory
+    const outputDirectory = outputFile || inputFile;
+
+    const files = fs.readdirSync(inputFile);
+
+    for (const file of files) {
+      const inputFilePath = path.join(inputFile, file);
+      const { name: inputFileName, extension } = divideFileName(inputFilePath);
+      const outputFilePath = path.join(
+        outputDirectory,
+        `${inputFileName}.test${extension}`
+      );
+
+      await executeForFile({
+        ...args,
+        inputFile: inputFilePath,
+        outputFile: outputFilePath,
+      });
+    }
+  } else {
+    await executeForFile(args);
+  }
+
+  process.exit(0);
+};
+
+export const executeForFile = async ({
+  inputFile,
+  outputFile,
+  apiKey,
+  model,
+  techs,
+  tips,
+  examples,
+  config,
+  stream,
+}: Omit<ICommandArgs, "help">) => {
+  let { extension: inputFileExtension } = divideFileName(inputFile);
 
   if (!inputFile) {
     console.error(chalk.red("Please provide an input file"));
@@ -136,7 +184,4 @@ export const executeCommand = async ({
     tips: parsedTips,
     stream,
   });
-
-  process.exit(0);
 };
-
