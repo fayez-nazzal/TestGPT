@@ -66,6 +66,8 @@ To use TestGPT, follow these steps:
    testgpt -i <path to your input file> -o <path to your test output file>
    ```
 
+   Note that `--inputFile`/`-i` and `--outputFile`/`-o` can be either a file path or directory, and in the later case, a tests will be generated for each file inside the directory.
+
    If you don't provide an `--outputFile`/`-o`, the generated test file will be saved in the same directory as the input file.
 
    ```zsh
@@ -112,7 +114,7 @@ You can also pass the `config` file path using the `--config`/`-c` argument.
 testgpt -i ./src/component.tsx -c `./testgpt.config.yaml`
 ```
 
-## Providing examples/examples to TestGPT
+## Providing examples/configs
 
 The file `testgpt.config.yaml` supports the `examples` property for each file extension:
 
