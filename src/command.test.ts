@@ -1,14 +1,10 @@
 import fs from "fs";
 import path from "path";
-import { program } from "commander";
-import chalk from "chalk";
-import { parseCommand, executeCommand } from "./command";
+import { executeCommand } from "./command";
 import { CONFIG_FILE_NAME } from "./const";
-import { readYamlFile } from "./utils";
-import { IExample } from "./types";
+import { divideFileName, readYamlFile } from "./utils";
 
 jest.mock("fs");
-jest.mock("path");
 jest.mock("commander");
 jest.mock("chalk", () => ({
   green: jest.fn(),
@@ -16,6 +12,7 @@ jest.mock("chalk", () => ({
   yellow: jest.fn(),
 }));
 jest.mock("./utils");
+jest.mock("path");
 
 (global as any).console = {
   log: jest.fn(),
@@ -30,6 +27,11 @@ jest.mock("./utils");
 describe("command", () => {
   beforeEach(() => {
     jest.resetAllMocks();
+
+    (divideFileName as jest.Mock).mockReturnValue({
+      name: "input",
+      extension: ".txt",
+    });
   });
 
   describe("executeCommand", () => {
@@ -41,7 +43,8 @@ describe("command", () => {
       techs: "JS,TS",
       tips: "good,bad",
       config: "test.yaml",
-      example: [],
+      examples: [],
+      stream: false,
       help: false,
     };
 
@@ -60,7 +63,7 @@ describe("command", () => {
       (path.join as jest.Mock).mockReturnValue(CONFIG_FILE_NAME);
       (readYamlFile as jest.Mock).mockReturnValueOnce({});
 
-      executeCommand({ ...mockArgs, config: "" });
+      executeCommand({ ...mockArgs, config: undefined });
 
       expect(fs.existsSync).toHaveBeenCalled();
       expect(mockReadYaml).not.toHaveBeenCalled();
@@ -107,7 +110,16 @@ describe("command", () => {
       (path.join as jest.Mock).mockReturnValue(CONFIG_FILE_NAME);
       (readYamlFile as jest.Mock).mockReturnValueOnce({});
 
-      executeCommand({ ...mockArgs, example: ["step1", "step2"] });
+      executeCommand({
+        ...mockArgs,
+        examples: [
+          {
+            fileName: "test.txt",
+            code: "test code",
+            tests: "test",
+          },
+        ],
+      });
 
       expect(fs.existsSync).toHaveBeenCalledTimes(1);
       expect(readYamlFile).not.toHaveBeenCalled();
@@ -125,7 +137,7 @@ describe("command", () => {
 
       executeCommand({
         ...mockArgs,
-        config: undefined,
+        config: "",
         techs: "python",
         tips: "bad",
       });

@@ -32,13 +32,13 @@ export interface IMessage {
 
 export interface ICommandArgs {
   inputFile: string;
-  outputFile: string;
+  outputFile?: string;
   apiKey: string;
   model: string;
   techs: string;
   tips: string;
   examples: IExample[];
-  config: string;
+  config?: string;
   stream: boolean;
   help: boolean;
 }

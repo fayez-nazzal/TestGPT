@@ -70,7 +70,8 @@ describe("utils", () => {
       writeToFile("path/to/file", "file content");
       expect(fs.writeFileSync).toHaveBeenCalledWith(
         "path/to/file",
-        "file content"
+        "file content",
+        { flag: "w" }
       );
       expect(chalk.green).toHaveBeenCalledWith(
         "Successfully wrote to file: path/to/file"
