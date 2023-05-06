@@ -114,7 +114,7 @@ You can also pass the `config` file path using the `--config`/`-c` argument.
 testgpt -i ./src/component.tsx -c `./testgpt.config.yaml`
 ```
 
-## Providing examples/configs
+## Providing examples
 
 The file `testgpt.config.yaml` supports the `examples` property for each file extension:
 
