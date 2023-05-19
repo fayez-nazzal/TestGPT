@@ -119,7 +119,7 @@ testgpt -i ./src/component.tsx -c `./testgpt.config.yaml`
 The file `testgpt.config.yaml` supports the `examples` property for each file extension:
 
 ```yaml
-.tsx
+.tsx:
    techs:
       - jest
       - react-testing-library
