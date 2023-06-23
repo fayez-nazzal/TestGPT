@@ -125,7 +125,7 @@ export const readYamlFile = (path: string) => {
   return parse(content);
 };
 
-export type IModel = "gpt-3.5-turbo" | "gpt-3.5-turbo-0301" | "gpt-4";
+export type IModel = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-4";
 
 export const initOpenAI = async (apiKey: string) => {
   const configuration = new Configuration({
