@@ -1,12 +1,8 @@
 # TestGPT
 
-A command-line tool for generating unit tests for your files automatically using OpenAI GPT-3.5-turbo model (gpt-4 also supported for developers who have it).
-
-> If you have access to GPT-4 API, you can now pass `--model`/`-m` option, see below for an example. 
+A command-line tool for generating unit tests for your files automatically using OpenAI GPT models E.p: GPT 4, GPT 3.5 turbo 16K, GPT 3.5 turbo, etc.
 
 > Now there is a VScode extension the process even faster, check the extension [here](https://marketplace.visualstudio.com/items?itemName=FayezNazzal.testgpt) (You have to install the latest version of testgpt for it to work)
-
-> NOTE: From version 3.0.0 and upwards, `testgpt.config.json` was replaced with `testgpt.config.yaml`, and a new custom property (`examples`) is added.
 
 <br />
 
@@ -118,6 +114,8 @@ testgpt -i ./src/component.tsx -c `./testgpt.config.yaml`
 
 The file `testgpt.config.yaml` supports the `examples` property for each file extension:
 
+> The more and longer the examples, the better the tests. Using high-context length models like `gpt-3.5-turbo-16k` would be a great advantage, as well as `gpt-4-32k`.
+
 ```yaml
 .tsx:
    techs:
@@ -145,7 +143,7 @@ The file `testgpt.config.yaml` supports the `examples` property for each file ex
 
 ## Providing custom model
 
-You can pass `--model`/`-m` option to use a custom model other than the default (currently gpt-3.5-turbo):
+You can pass `--model`/`-m` option to use a custom model other than the default (currently gpt-3.5-turbo-16k):
 
 ```zsh
 testgpt -i ./src/component.tsx -m gpt-4
