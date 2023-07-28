@@ -1,8 +1,8 @@
 # TestGPT
 
-A command-line tool for generating unit tests for your files automatically using OpenAI GPT models E.p: GPT 4, GPT 3.5 turbo 16K, GPT 3.5 turbo, etc.
+A command-line tool for generating tests automatically using OpenAI GPT models E.p: GPT 4, GPT 3.5 turbo 16K, GPT 3.5 turbo, etc.
 
-> Now there is a VScode extension the process even faster, check the extension [here](https://marketplace.visualstudio.com/items?itemName=FayezNazzal.testgpt) (You have to install the latest version of testgpt for it to work)
+> 🤖 A Visual Studio Code Extension is available! Check it in the <strong>[VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=FayezNazzal.testgpt)</strong>
 
 <br />
 
@@ -14,8 +14,6 @@ A command-line tool for generating unit tests for your files automatically using
 
 ## Installation 
 
-To use TestGPT, follow these steps:
-
 1. Install TestGPT by running one of these commands:
 
    ```zsh
@@ -26,10 +24,10 @@ To use TestGPT, follow these steps:
    npm install testgpt@latest
    ```
 
-2. **Get your OpenAI API** key by requesting access to the [OpenAI API](https://openai.com/api/) and obtaining your [API key](https://platform.openai.com/account/api-keys). Then, export your OpenAI key based on your operating system:
-   
-   You then need to export your OpenAI key. Follow the steps to export for your OS:
-   - **macOS or Linux (zsh):** Add the following line to .zshrc in your home or ~ directory:
+2. **Get your OpenAI API Key** by requesting access to the [OpenAI API](https://openai.com/api/) and obtaining your [API key](https://platform.openai.com/account/api-keys).
+
+   Then export it based on your OS:
+   - **macOS or Linux:** Add the following line to .zshrc or .bashrc in your home director:
 
       ```zsh
       export OPENAI_API_KEY="Your OpenAI API Key."
@@ -40,117 +38,63 @@ To use TestGPT, follow these steps:
       ```zsh
       source ~/.zshrc
       ```
-      
-   - **Linux (bash):** Add the following line to ~/.bashrc:
-      
-      ```bash
-      export OPENAI_API_KEY="Your OpenAI API Key."
-      ```
-      
-      Then run the command:
-      
-      ```bash
-      source ~/.bashrc
-      ```
 
    - **Windows:** Go to System -> Settings -> Advanced -> Environment Variables, click New under System Variables, and create a new entry with the key `OPENAI_API_KEY` and your OpenAI API Key as the value.
-   
 
-3. If you have `testgpt.config.yaml` you can  **Generate** unit tests by running this command from your project's root directory (where testgpt.config.yaml is located):
+## Usage
 
-   ```zsh
-   testgpt -i <path to your input file> -o <path to your test output file>
-   ```
 
-   Note that `--inputFile`/`-i` and `--outputFile`/`-o` can be either a file path or directory, and in the later case, a tests will be generated for each file inside the directory.
+### Universal / Plug and Play
 
-   If you don't provide an `--outputFile`/`-o`, the generated test file will be saved in the same directory as the input file.
-
-   ```zsh
-   testgpt -i ./src/component.tsx
-   # Output file will be ./src/component.test.tsx
-   ```
-
-## Providing custom techs using a config file
-
-You can create a `testgpt.config.yaml` file in your project's root directory to specify technologies and tips for each file extension. Example:
-
-```yaml
-.ts:
-  techs:
-    - jest
-  tips:
-    - use 2 spaces for indentation
-    - wrap each group of tests in a describe block
-    - Don't forget to import the things you need.
-
-.tsx:
-  techs:
-    - jest
-    - react-testing-library
-    - userEvent
-  tips:
-    - use 2 spaces for indentation
-    - use screen
-    - wrap each group of tests in a describe block
-    - when using user event, use an async function and await the user event
-    - prefer not to use getByTestId
-    - Don't forget to import the things you need.
-```
-
-Then you can run the following command from the same directory as the config file:
+Here's a simple form of a test generation command:
 
 ```zsh
-testgpt -i ./src/component.tsx
+testgpt -i ./component.tsx -m gpt4
+# Creates: ./component.test.tsx
 ```
 
-You can also pass the `config` file path using the `--config`/`-c` argument.
+With more options, comes more power! You can easily specify target techs, tips, and specify a custom GPT model, along with other options, here is a breakdown table:
+
+| Option        | Description | Required | Default Value |
+| ------------- | ----------- | -------- | ------------- |
+| `-i, --inputFile` | Path for the input file. | Yes | 
+| `-o, --outputFile` | Path for the output file. | No | \<inputFile\>.test.\<extension\>.
+| `-k, --apiKey` | OpenAI API key. | No | Taken as environment variable.
+| `-m, --model` | GPT model to be used for generating tests. | No | gpt-3.5-turbo-16k.
+| `-t, --techs` | The technologies to be used. | No |
+| `-p, --tips` | The tips to be used. | No |
+| `-c, --config` | Path to config file. | No |
+
+Here is an example command that uses more options like mentioned above:
 
 ```zsh
-testgpt -i ./src/component.tsx -c `./testgpt.config.yaml`
+testgpt -i ./Button.tsx -o ./Button.spec.tsx -m gpt-4 --techs "jest, testing-library" --apiKey "Your OpenAI API Key"
 ```
 
-## Providing examples
 
-The file `testgpt.config.yaml` supports the `examples` property for each file extension:
+### Locally / Config-based
 
-> The more and longer the examples, the better the tests. Using high-context length models like `gpt-3.5-turbo-16k` would be a great advantage, as well as `gpt-4-32k`.
+For extra flexibility, having `testgpt.config.yaml` at your project's root allows for running shorter commands, quicker and more friendly for repitive usage.
 
+An example of a `testgpt.config.yaml` file:
 ```yaml
 .tsx:
    techs:
       - jest
       - react-testing-library
    tips:
-      - wrap each group of tests in a describe block
+      - Wrap test groups in 'describe' blocks
    examples:
       - fileName: file1.tsx
-        code: <code content for file1.tsx>
-        tests: <tests content for file1.tsx>
+        code: <code for file1.tsx>
+        tests: <tests for file1.tsx>
       - fileName: file2.tsx
-        code: <code content for file2.tsx>
-        tests: <tests content for file2.tsx>
+        code: <code for file2.tsx>
+        tests: <tests for file2.tsx>
 ```
 
-## Providing custom techs directly
-
-   You can pass `--techs`/`-t` and `--tips`/`-p` directly for each command
-
-   ```zsh
-   testgpt -i ./src/component.tsx --techs react,jest --tips "Don't forget to import what you need"`
-   ```
-
-
-## Providing custom model
-
-You can pass `--model`/`-m` option to use a custom model other than the default (currently gpt-3.5-turbo-16k):
-
-```zsh
-testgpt -i ./src/component.tsx -m gpt-4
-```
+> More and longer examples enhance the test quality. This will be more possible with high-context length models like gpt-3.5-turbo-16k or gpt-4-32k.
 
 ## License
 
-TestGPT is released under the MIT License. Feel free to use it and contribute to it!
-
-> Thanks to OpenAI for generating this README and my unit tests for this project :)
+This tool is licensed under the MIT License. Feel free to use it however you like, and contributions are always welcome 😊
