@@ -61,6 +61,7 @@ With more options, comes more power! You can easily specify target techs, tips, 
 | `-o, --outputFile` | Path for the output file. | No | \<inputFile\>.test.\<extension\>.
 | `-k, --apiKey` | OpenAI API key. | No | Taken as an environment variable.
 | `-m, --model` | GPT model to be used for generating tests. | No | gpt-3.5-turbo-16k.
+| `-s, --stream` | Stream the response using OpenAI streaming feature. | No |
 | `-t, --techs` | The technologies to be used. | No |
 | `-p, --tips` | The tips to be used. | No |
 | `-c, --config` | Path to config file. | No |
