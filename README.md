@@ -7,7 +7,7 @@
 
 Your AI testing companion that writes tests on your behalf, automated to get you to build and ship faster without sacrificing tests.
 
-By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the optio to use gpt-4, or any other model you want.
+By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the option to use gpt-4, or any other model you want.
 
 > 🤖 A Visual Studio Code Extension is available! Check it in the <strong>[VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=FayezNazzal.testgpt)</strong>
 
