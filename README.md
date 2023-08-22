@@ -1,6 +1,13 @@
-# TestGPT
+![TestGPT - Logo Cover](https://github.com/fayez-nazzal/TestGPT/assets/49946791/77ec722a-dfb6-4f49-a4b1-d4b659219765)
 
-A command-line tool for generating tests automatically using OpenAI GPT models E.p GPT 4, GPT 3.5 turbo 16K, GPT 3.5 turbo, etc.
+<h1>
+   <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="32px" height="32px" />
+   TestGPT
+</h1>
+
+Your AI testing companion that writes tests on your behalf, automated to get you to build and ship faster without sacrificing tests.
+
+By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the optio to use gpt-4, or any other model you want.
 
 > 🤖 A Visual Studio Code Extension is available! Check it in the <strong>[VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=FayezNazzal.testgpt)</strong>
 
