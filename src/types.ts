@@ -6,11 +6,12 @@ export interface IConfig {
   };
 }
 
-export interface iGetPromptArgs {
+export interface IGetPromptArgs {
   content: string;
   fileName: string;
   techs?: string[];
   instructions?: string[];
+  promptTemplate?: string;
 }
 
 export interface IExample {
@@ -35,6 +36,7 @@ export interface ICommandArgs {
   outputFile?: string;
   apiKey: string;
   model: string;
+  promptTemplate: string;
   techs: string;
   instructions: string;
   examples: IExample[];

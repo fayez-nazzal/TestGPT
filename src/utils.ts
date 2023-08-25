@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import { Configuration, CreateChatCompletionRequest, OpenAIApi } from "openai";
 import { parse } from "yaml";
-import { ERole, IExample, IMessage, iGetPromptArgs } from "./types";
+import { ERole, IExample, IMessage, IGetPromptArgs } from "./types";
 
 export const readFile = (path: string) => {
   try {
@@ -56,38 +56,46 @@ export const getFileType = (path: string) => {
 export const toList = (arr: string[]) =>
   arr.map((tip, index) => `${index + 1}. ${tip}`).join("\r\n");
 
+export const parseTemplatePrompt = (template: string, args: any) => {
+  const regex = /{(\w+)}/g;
+
+  return template.replace(regex, (_, key) => {
+    return args[key];
+  });
+};
+
 export const getPrompt = ({
   content,
   fileName,
   techs,
   instructions,
-}: iGetPromptArgs) => {
-  let prompt = `I need unit tests for a file called ${fileName}`;
+  promptTemplate,
+}: IGetPromptArgs) => {
+  let prompt =
+    promptTemplate ??
+    `Please provide unit tests for the file {fileName} using {techs}
+{instructions}
 
-  if (techs?.length) {
-    prompt += ` using the following technologies: 
-      ${toList(techs)}
-    `;
-  }
+Please begin your response with \`\`\` and end it with \`\`\` directly.
 
-  if (instructions?.length) {
-    prompt += instructions.join("\r\n");
-  }
+Here is the file content:
+\`\`\`{content}\`\`\``;
 
-  prompt +=
-    "Your answer should be only the code block. Start your response with ``` directly and end it with ``` only, don't add any more text.";
+  const techsCotent = techs?.length ? toList(techs) : "same techs as the file";
+  const instructionsContent = instructions?.join("\r\n") || "";
 
-  prompt += `Here is the file content: 
-    \`\`\`
-    ${content}
-    \`\`\`
-  `;
+  const resultPrompt = parseTemplatePrompt(prompt, {
+    content,
+    fileName,
+    techs: techsCotent,
+    instructions: instructionsContent,
+  });
 
-  return prompt;
+  return resultPrompt;
 };
 
 export const getExampleMessages = (
-  promptArgs: iGetPromptArgs,
+  promptArgs: IGetPromptArgs,
   examples?: IExample[]
 ) => {
   if (!examples) {
@@ -213,6 +221,7 @@ interface IAutoTestArgs {
   outputFile: string;
   apiKey: string;
   model: IModel;
+  promptTemplate?: string;
   modelEndpoint?: string;
   examples?: IExample[];
   techs?: string[];
@@ -225,6 +234,7 @@ export const autoTest = async ({
   outputFile,
   apiKey,
   model,
+  promptTemplate,
   examples,
   techs,
   instructions,
@@ -248,14 +258,14 @@ export const autoTest = async ({
     fileName: inputFile,
     techs,
     instructions,
+    promptTemplate,
   };
 
   const prompt = getPrompt(promptArgs);
   const exampleMessages = getExampleMessages(promptArgs, examples);
 
-
   if (modelEndpoint) {
-    console.log('Found model endpoint, using it instead of OpenAI API')
+    console.log("Found model endpoint, using it instead of OpenAI API");
     const response = await fetch(modelEndpoint, {
       method: "POST",
       body: JSON.stringify({

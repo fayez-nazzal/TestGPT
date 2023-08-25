@@ -21,11 +21,12 @@ export const parseCommand = () => {
     .option("-o, --outputFile <char>")
     .option("-k, --apiKey <char>")
     .option("-m, --model <char>")
+    .option("-p, --promptTemplate <char>")
     .option("-t, --techs <char>")
     .option("-n, --instructions <char>")
     .option("-c, --config <char>")
     .option("-s, --stream")
-    .option('-e, --modelEndpoint <char>')
+    .option("-e, --modelEndpoint <char>")
     .option("-h, --help");
 
   program.parse();
@@ -116,12 +117,13 @@ export const executeForFile = async ({
   outputFile,
   apiKey,
   model,
+  promptTemplate,
   techs,
   instructions,
   examples,
   config,
   stream,
-  modelEndpoint
+  modelEndpoint,
 }: Omit<ICommandArgs, "help">) => {
   let { extension: inputFileExtension } = divideFileName(inputFile);
 
@@ -181,10 +183,11 @@ export const executeForFile = async ({
     outputFile,
     apiKey,
     model: model as IModel,
+    promptTemplate,
     examples,
     techs: parsedTechs,
     instructions: parsedInstructions,
     stream,
-    modelEndpoint
+    modelEndpoint,
   });
 };
