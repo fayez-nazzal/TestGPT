@@ -22,6 +22,7 @@ export const parseCommand = () => {
     .option("-k, --apiKey <char>")
     .option("-m, --model <char>")
     .option("-p, --promptTemplate <char>")
+    .option("-y, --systemMessage <char>")
     .option("-t, --techs <char>")
     .option("-n, --instructions <char>")
     .option("-c, --config <char>")
@@ -117,6 +118,7 @@ export const executeForFile = async ({
   outputFile,
   apiKey,
   model,
+  systemMessage,
   promptTemplate,
   techs,
   instructions,
@@ -183,6 +185,7 @@ export const executeForFile = async ({
     outputFile,
     apiKey,
     model: model as IModel,
+    systemMessage,
     promptTemplate,
     examples,
     techs: parsedTechs,
