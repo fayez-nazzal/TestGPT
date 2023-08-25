@@ -70,7 +70,7 @@ With more options, comes more power! You can easily specify target techs, tips, 
 | `-m, --model` | GPT model to be used for generating tests. | No | gpt-3.5-turbo-16k.
 | `-s, --stream` | Stream the response using OpenAI streaming feature. | No |
 | `-t, --techs` | The technologies to be used. | No |
-| `-p, --tips` | The tips to be used. | No |
+| `-p, --instructions` | The instructions to be used. | No |
 | `-c, --config` | Path to config file. | No |
 
 Here is an example command that uses more options like those mentioned above:
@@ -90,7 +90,7 @@ An example of a `testgpt.config.yaml` file:
    techs:
       - jest
       - react-testing-library
-   tips:
+   instructions:
       - Wrap test groups in 'describe' blocks
    examples:
       - fileName: file1.tsx
