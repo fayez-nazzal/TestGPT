@@ -40,5 +40,6 @@ export interface ICommandArgs {
   examples: IExample[];
   config?: string;
   stream: boolean;
+  modelEndpoint: string;
   help: boolean;
 }
