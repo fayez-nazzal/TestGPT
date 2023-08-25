@@ -60,7 +60,7 @@ export const getPrompt = ({
   content,
   fileName,
   techs,
-  tips,
+  instructions,
 }: iGetPromptArgs) => {
   let prompt = `I need unit tests for a file called ${fileName}`;
 
@@ -70,10 +70,8 @@ export const getPrompt = ({
     `;
   }
 
-  if (tips?.length) {
-    prompt += `Here are some tips: 
-      ${toList(tips)}
-    `;
+  if (instructions?.length) {
+    prompt += instructions.join("\r\n");
   }
 
   prompt +=
@@ -218,7 +216,7 @@ interface IAutoTestArgs {
   modelEndpoint?: string;
   examples?: IExample[];
   techs?: string[];
-  tips?: string[];
+  instructions?: string[];
   stream?: boolean;
 }
 
@@ -229,7 +227,7 @@ export const autoTest = async ({
   model,
   examples,
   techs,
-  tips,
+  instructions,
   stream,
   modelEndpoint,
 }: IAutoTestArgs) => {
@@ -249,7 +247,7 @@ export const autoTest = async ({
     content,
     fileName: inputFile,
     techs,
-    tips,
+    instructions,
   };
 
   const prompt = getPrompt(promptArgs);

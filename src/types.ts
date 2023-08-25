@@ -1,7 +1,7 @@
 export interface IConfig {
   [key: `.${string}`]: {
     techs: string[];
-    tips: string[];
+    instructions: string[];
     examples: IExample[];
   };
 }
@@ -10,7 +10,7 @@ export interface iGetPromptArgs {
   content: string;
   fileName: string;
   techs?: string[];
-  tips?: string[];
+  instructions?: string[];
 }
 
 export interface IExample {
@@ -36,7 +36,7 @@ export interface ICommandArgs {
   apiKey: string;
   model: string;
   techs: string;
-  tips: string;
+  instructions: string;
   examples: IExample[];
   config?: string;
   stream: boolean;

@@ -1,7 +1,7 @@
 .ts:
   techs:
     - jest
-  tips:
+  instructions:
     - use 2 spaces for indentation
     - wrap each group of tests in a describe block
     - Don't forget to import the things you need.
