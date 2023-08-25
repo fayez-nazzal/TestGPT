@@ -257,6 +257,7 @@ export const autoTest = async ({
 
 
   if (modelEndpoint) {
+    console.log('Found model endpoint, using it instead of OpenAI API')
     const response = await fetch(modelEndpoint, {
       method: "POST",
       body: JSON.stringify({
@@ -268,8 +269,8 @@ export const autoTest = async ({
       },
     });
 
-    const json = await response.json();
-    writeToFile(outputFile, json.tests);
+    const text = await response.text();
+    writeToFile(outputFile, text);
     return;
   }
 
