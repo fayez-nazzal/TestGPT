@@ -25,6 +25,7 @@ export const parseCommand = () => {
     .option("-p, --tips <char>")
     .option("-c, --config <char>")
     .option("-s, --stream")
+    .option('--modelEndpoint <char>')
     .option("-h, --help");
 
   program.parse();
@@ -120,6 +121,7 @@ export const executeForFile = async ({
   examples,
   config,
   stream,
+  modelEndpoint
 }: Omit<ICommandArgs, "help">) => {
   let { extension: inputFileExtension } = divideFileName(inputFile);
 
@@ -183,5 +185,6 @@ export const executeForFile = async ({
     techs: parsedTechs,
     tips: parsedTips,
     stream,
+    modelEndpoint
   });
 };

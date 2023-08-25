@@ -215,6 +215,7 @@ interface IAutoTestArgs {
   outputFile: string;
   apiKey: string;
   model: IModel;
+  modelEndpoint?: string;
   examples?: IExample[];
   techs?: string[];
   tips?: string[];
@@ -230,6 +231,7 @@ export const autoTest = async ({
   techs,
   tips,
   stream,
+  modelEndpoint,
 }: IAutoTestArgs) => {
   console.log(chalk.blue("Reading input file..."));
 
@@ -243,8 +245,6 @@ export const autoTest = async ({
 
   console.log(chalk.blue("Generating tests..."));
 
-  const openai = await initOpenAI(apiKey);
-
   const promptArgs = {
     content,
     fileName: inputFile,
@@ -254,11 +254,33 @@ export const autoTest = async ({
 
   const prompt = getPrompt(promptArgs);
   const exampleMessages = getExampleMessages(promptArgs, examples);
+
+
+  if (modelEndpoint) {
+    console.log('Found model endpoint, using it instead of OpenAI API')
+    const response = await fetch(modelEndpoint, {
+      method: "POST",
+      body: JSON.stringify({
+        prompt,
+        examples: exampleMessages,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const text = await response.text();
+    writeToFile(outputFile, text);
+    return;
+  }
+
   const completionRequest = getCompletionRequest(
     model,
     prompt,
     exampleMessages
   );
+
+  const openai = await initOpenAI(apiKey);
 
   if (stream) {
     await streamTestContent(completionRequest, openai, (token) => {
