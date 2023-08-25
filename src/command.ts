@@ -22,10 +22,10 @@ export const parseCommand = () => {
     .option("-k, --apiKey <char>")
     .option("-m, --model <char>")
     .option("-t, --techs <char>")
-    .option("-p, --tips <char>")
+    .option("-n, --instructions <char>")
     .option("-c, --config <char>")
     .option("-s, --stream")
-    .option('--modelEndpoint <char>')
+    .option('-e, --modelEndpoint <char>')
     .option("-h, --help");
 
   program.parse();
@@ -35,7 +35,7 @@ export const parseCommand = () => {
   if (options.help) {
     console.log(
       chalk.blue(
-        `Usage: testgpt -i <inputFile> -o <outputFile> -k <apiKey> -m <model> -t <techs> -p <tips> -c <config>`
+        `Usage: testgpt -i <inputFile> -o <outputFile> -k <apiKey> -m <model> -t <techs> -p <instructions> -c <config>`
       )
     );
 
@@ -57,7 +57,7 @@ export const executeCommand = async (args: ICommandArgs) => {
   if (help) {
     console.log(
       chalk.blue(
-        `Usage: testgpt -i <inputFile> -o <outputFile> -k <apiKey> -m <model> -t <techs> -p <tips> -c <config>`
+        `Usage: testgpt -i <inputFile> -o <outputFile> -k <apiKey> -m <model> -t <techs> -p <instructions> -c <config>`
       )
     );
 
@@ -117,7 +117,7 @@ export const executeForFile = async ({
   apiKey,
   model,
   techs,
-  tips,
+  instructions,
   examples,
   config,
   stream,
@@ -149,7 +149,7 @@ export const executeForFile = async ({
       testGPTConfig = {
         [inputFileExtension]: {
           techs: techs?.split(",") || [],
-          tips: tips?.split(",") || [],
+          instructions: instructions?.split(",") || [],
           examples: [],
         },
       };
@@ -171,7 +171,7 @@ export const executeForFile = async ({
   }
 
   const parsedTechs = testGPTConfig?.[inputFileExtension]?.techs;
-  const parsedTips = testGPTConfig?.[inputFileExtension]?.tips;
+  const parsedInstructions = testGPTConfig?.[inputFileExtension]?.instructions;
   examples ??= testGPTConfig?.[inputFileExtension]?.examples;
   apiKey ??= process.env.OPENAI_API_KEY;
   model ??= DEFAULT_MODEL;
@@ -183,7 +183,7 @@ export const executeForFile = async ({
     model: model as IModel,
     examples,
     techs: parsedTechs,
-    tips: parsedTips,
+    instructions: parsedInstructions,
     stream,
     modelEndpoint
   });
