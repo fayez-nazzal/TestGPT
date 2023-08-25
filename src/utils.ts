@@ -147,16 +147,19 @@ export type ICompletionRequest = CreateChatCompletionRequest;
 
 export const getCompletionRequest = (
   model: IModel,
+  systemMessage: string,
   prompt: string,
   examples: IMessage[]
 ) => {
+  systemMessage ??=
+    "You are my unit testing assistant, you will help me write unit tests for the files I provide, your reply will only include the unit tests without any additional information, starting your response with ``` and ending it with ``` directly will help me understand your response better.";
+
   return {
     model,
     messages: [
       {
         role: ERole.System,
-        content:
-          "You are an assistant that provides unit tests for a given file.",
+        content: systemMessage,
       },
       ...examples,
       {
@@ -221,6 +224,7 @@ interface IAutoTestArgs {
   outputFile: string;
   apiKey: string;
   model: IModel;
+  systemMessage?: string;
   promptTemplate?: string;
   modelEndpoint?: string;
   examples?: IExample[];
@@ -234,6 +238,7 @@ export const autoTest = async ({
   outputFile,
   apiKey,
   model,
+  systemMessage,
   promptTemplate,
   examples,
   techs,
@@ -284,6 +289,7 @@ export const autoTest = async ({
 
   const completionRequest = getCompletionRequest(
     model,
+    systemMessage,
     prompt,
     exampleMessages
   );

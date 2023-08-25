@@ -36,6 +36,7 @@ export interface ICommandArgs {
   outputFile?: string;
   apiKey: string;
   model: string;
+  systemMessage: string;
   promptTemplate: string;
   techs: string;
   instructions: string;
