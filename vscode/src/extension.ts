@@ -1,7 +1,12 @@
 import * as vscode from "vscode";
 import * as cp from "child_process";
+import { NodeDependenciesProvider } from "./tree";
 
 export function activate(context: vscode.ExtensionContext) {
+  vscode.window.createTreeView("testgpt", {
+    treeDataProvider: new NodeDependenciesProvider("."),
+  });
+
   let disposable = vscode.commands.registerCommand(
     "testgpt.runTestGpt",
     async () => {
@@ -33,12 +38,8 @@ export function activate(context: vscode.ExtensionContext) {
           );
       }
 
-      const model = vscode.workspace
-        .getConfiguration()
-        .get<string>("testgpt.model");
-
       const filePath = editor.document.fileName;
-      const command = `npx --yes testgpt@latest -i "${filePath}" -k "${apiKey}" -m "${model}" -s`;
+      const command = `npx --yes testgpt@latest -i "${filePath}" -k "${apiKey}" -s`;
 
       vscode.window.showInformationMessage(
         `Generating unit tests for ${filePath}`
