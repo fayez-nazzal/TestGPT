@@ -147,7 +147,7 @@ export type ICompletionRequest = CreateChatCompletionRequest;
 
 export const getCompletionRequest = (
   model: IModel,
-  systemMessage: string,
+  systemMessage: string | undefined,
   prompt: string,
   examples: IMessage[]
 ) => {
@@ -178,7 +178,7 @@ export const getTestContent = async (
 
   // remove lines that start with ``` (markdown code block)
   const regex = /^```.*$/gm;
-  return response.data.choices[0].message.content?.replace(regex, "");
+  return response.data.choices[0].message?.content?.replace(regex, "");
 };
 
 export const streamTestContent = async (
@@ -302,6 +302,12 @@ export const autoTest = async ({
     });
   } else {
     const testContent = await getTestContent(completionRequest, openai);
+
+    if (!testContent) {
+      console.error(chalk.red("Error generating tests - No tests content"));
+      process.exit(1);
+    }
+
     writeToFile(outputFile, testContent);
   }
 };

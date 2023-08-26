@@ -1,3 +1,5 @@
+import { JSONSchemaType } from "ajv";
+
 export interface IConfig {
   [key: `.${string}`]: {
     techs: string[];
@@ -19,6 +21,25 @@ export interface IExample {
   code: string;
   tests: string;
 }
+
+export const examplesSchema: JSONSchemaType<IExample[]> = {
+  type: "array",
+  items: {
+    type: "object",
+    required: ["fileName", "code", "tests"],
+    properties: {
+      fileName: {
+        type: "string",
+      },
+      code: {
+        type: "string",
+      },
+      tests: {
+        type: "string",
+      },
+    },
+  },
+};
 
 export enum ERole {
   User = "user",
