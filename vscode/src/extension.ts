@@ -37,36 +37,27 @@ export function activate(context: vscode.ExtensionContext) {
         .getConfiguration()
         .get<string>("testgpt.model");
 
-      cp.exec("testgpt -h", (error) => {
+      const filePath = editor.document.fileName;
+      const command = `npx testgpt -- -i "${filePath}" -k "${apiKey}" -m "${model}" -s`;
+
+      vscode.window.showInformationMessage(
+        `Generating unit tests for ${filePath}`
+      );
+
+      cp.exec(command, (error, stdout, stderr) => {
         if (error) {
-          vscode.window.showErrorMessage(
-            `Please install TestGPT using npm install -g testgpt@latest`
-          );
+          vscode.window.showErrorMessage(`Error: ${error.message}`);
           return;
         }
 
-        const filePath = editor.document.fileName;
-        const command = `testgpt -i "${filePath}" -k "${apiKey}" -m "${model}" -s`;
+        if (stderr) {
+          vscode.window.showErrorMessage(`Error: ${stderr}`);
+          return;
+        }
 
         vscode.window.showInformationMessage(
-          `Generating unit tests for ${filePath}`
+          `Unit tests for file ${filePath} generated inside the same directory!`
         );
-
-        cp.exec(command, (error, stdout, stderr) => {
-          if (error) {
-            vscode.window.showErrorMessage(`Error: ${error.message}`);
-            return;
-          }
-
-          if (stderr) {
-            vscode.window.showErrorMessage(`Error: ${stderr}`);
-            return;
-          }
-
-          vscode.window.showInformationMessage(
-            `Unit tests for file ${filePath} generated inside the same directory!`
-          );
-        });
       });
     }
   );
