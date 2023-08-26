@@ -50,14 +50,26 @@
             "type": "string",
             "default": "",
             "description": "API Key for TestGPT"
-          },
-          "testgpt.model": {
-            "type": "string",
-            "default": "gpt-3.5-turbo",
-            "description": "GPT Model to use for TestGPT"
           }
         }
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "testgpt",
+          "title": "TestGPT",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "testgpt": [
+        {
+          "id": "testgpt",
+          "name": "TestGPT"
+        }
+      ]
+    }
   }
 }
