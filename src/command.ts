@@ -5,7 +5,7 @@ import { program } from "commander";
 import chalk from "chalk";
 
 import { CONFIG_FILE_NAME, DEFAULT_MODEL } from "./const";
-import { ICommandArgs, IConfig } from "./types";
+import { ICommandArgs, IConfig, examplesSchema } from "./types";
 import {
   autoTest,
   divideFileName,
@@ -14,6 +14,7 @@ import {
   IModel,
   readYamlFile,
 } from "./utils";
+import Ajv from "ajv";
 
 export const parseCommand = () => {
   program
@@ -25,6 +26,7 @@ export const parseCommand = () => {
     .option("-y, --systemMessage <char>")
     .option("-t, --techs <char>")
     .option("-n, --instructions <char>")
+    .option("-x, --examples <char>")
     .option("-c, --config <char>")
     .option("-s, --stream")
     .option("-e, --modelEndpoint <char>")
@@ -127,6 +129,20 @@ export const executeForFile = async ({
   stream,
   modelEndpoint,
 }: Omit<ICommandArgs, "help">) => {
+  if (examples && typeof examples === "string") {
+    const ajv = new Ajv();
+    const validate = ajv.compile(examplesSchema);
+
+    examples = JSON.parse(examples);
+
+    const valid = validate(examples);
+    if (!valid) {
+      console.error(chalk.red("Invalid examples format"));
+      console.error(chalk.red(JSON.stringify(validate.errors, null, 2)));
+      process.exit(1);
+    }
+  }
+
   let { extension: inputFileExtension } = divideFileName(inputFile);
 
   if (!inputFile) {
@@ -177,7 +193,7 @@ export const executeForFile = async ({
   const parsedTechs = testGPTConfig?.[inputFileExtension]?.techs;
   const parsedInstructions = testGPTConfig?.[inputFileExtension]?.instructions;
   examples ??= testGPTConfig?.[inputFileExtension]?.examples;
-  apiKey ??= process.env.OPENAI_API_KEY;
+  apiKey ??= process.env.OPENAI_API_KEY as string;
   model ??= DEFAULT_MODEL;
 
   await autoTest({
