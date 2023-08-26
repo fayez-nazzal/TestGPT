@@ -38,7 +38,7 @@ export function activate(context: vscode.ExtensionContext) {
         .get<string>("testgpt.model");
 
       const filePath = editor.document.fileName;
-      const command = `npx testgpt -- -i "${filePath}" -k "${apiKey}" -m "${model}" -s`;
+      const command = `npx --yes testgpt@latest -i "${filePath}" -k "${apiKey}" -m "${model}" -s`;
 
       vscode.window.showInformationMessage(
         `Generating unit tests for ${filePath}`
