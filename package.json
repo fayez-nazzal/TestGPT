@@ -1,11 +1,8 @@
 {
   "name": "testgpt",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "",
   "main": "index.js",
-  "files": [
-    "bin"
-  ],
   "types": "bin/index.d.ts",
   "bin": {
     "testgpt": "bin/index.js"
