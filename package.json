@@ -3,9 +3,6 @@
   "version": "3.0.5",
   "description": "",
   "main": "index.js",
-  "files": [
-    "bin"
-  ],
   "types": "bin/index.d.ts",
   "bin": {
     "testgpt": "bin/index.js"
