@@ -129,6 +129,50 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
 
           fs.writeFileSync(presetsUri.fsPath, strPresets);
         }
+
+        if (message.type === "test") {
+          // get active file in the editor
+          const activeEditor = window.activeTextEditor;
+          if (!activeEditor) {
+            window.showErrorMessage("No active editor");
+            return;
+          }
+
+          // get active file path
+          const activeFilePath = activeEditor.document.fileName;
+          if (!activeFilePath) {
+            window.showErrorMessage("No active file");
+            return;
+          }
+
+          const defaultOutputFile = activeFilePath.replace(/\.[^/.]+$/, (ext) => `spec${ext}`);
+          const outputFile = message.outputFile || defaultOutputFile;
+
+          const model = message.model;
+          const streaming = message.streaming;
+          const systemMessage = message.systemMessage;
+          const promptTemplate = message.promptTemplate;
+          const instructions = message.instructions;
+          const techs = message.techs.join(", ");
+          const examples = JSON.stringify(message.examples);
+          const key = "";
+
+          if (!outputFile || !systemMessage || !promptTemplate || !instructions || !techs || !examples) {
+            window.showErrorMessage("Missing required fields");
+            return;
+          }
+
+          const command = `npx --yes testgpt@latest -i "${activeFilePath}" -o "${outputFile}" ${
+            streaming ? "-s" : ""
+          } -p "${promptTemplate}" -m "${model}" -k "${key}" -t "${techs}" -e "${examples.replace(
+            /"/g,
+            '\\"'
+          )}" -y "${systemMessage}" -n "${instructions}"`;
+
+          const terminal = window.createTerminal("TestGPT");
+          terminal.sendText(command);
+          terminal.show();
+        }
       },
       undefined,
       this._disposables
