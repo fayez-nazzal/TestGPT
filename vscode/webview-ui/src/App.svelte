@@ -6,17 +6,11 @@
 
   provideVSCodeDesignSystem().register(allComponents);
 
-  const activePreset = ((window as any).activePreset as IPreset) || {
+  let presets = ((window as any).presets as IPreset[]) || [];
+  let activePreset = ((window as any).activePreset as IPreset) || {
     name: "Default Preset",
     config: {},
   };
-
-  function handleHowdyClick() {
-    vscode.postMessage({
-      command: "hello",
-      text: "Hey there partner! 🤠",
-    });
-  }
 
   let systemMessage = activePreset.config.systemMessage;
   const handleSystemMessageChange = (event: CustomEvent) => {
@@ -94,12 +88,27 @@
       data: activePreset,
     });
   }
+
+  const onPresetDropdownChange: EventHandler<any, any> = (event) => {
+    activePreset = presets.find((p) => p.name === event.currentTarget.value)!;
+    streaming = activePreset.config.streaming;
+    systemMessage = activePreset.config.systemMessage;
+    promptTemplate = activePreset.config.promptTemplate;
+    instructions = activePreset.config.instructions;
+    examples = activePreset.config.examples || [];
+    autoTechs = activePreset.config.autoTechs;
+    techs = activePreset.config.techs as string[];
+
+  };
 </script>
 
 <main class="flex-col">
-  <vscode-dropdown>
-    <vscode-option>Default Preset</vscode-option>
-    <vscode-option>React & Jest</vscode-option>
+  <vscode-dropdown on:change={onPresetDropdownChange}>
+    {#each presets as preset}
+      <vscode-option
+        >{preset.name}</vscode-option
+      >
+    {/each}
   </vscode-dropdown>
 
   <form>
