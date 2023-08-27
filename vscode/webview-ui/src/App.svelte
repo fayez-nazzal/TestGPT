@@ -74,6 +74,12 @@
     examples = [...examples];
   };
 
+  let model = activePreset.config.model;
+
+  const onModelDropdownChange: EventHandler<any, any> = (event) => {
+    model = event.currentTarget.value;
+  };
+
   $: {
     activePreset.config.streaming = streaming;
     activePreset.config.systemMessage = systemMessage;
@@ -82,6 +88,7 @@
     activePreset.config.examples = examples;
     activePreset.config.autoTechs = autoTechs;
     activePreset.config.techs = techs;
+    activePreset.config.model = model;
 
     vscode.postMessage({
       type: "preset",
@@ -98,20 +105,49 @@
     examples = activePreset.config.examples || [];
     autoTechs = activePreset.config.autoTechs;
     techs = activePreset.config.techs as string[];
-
+    model = activePreset.config.model;
+  };
+  
+  const onSubmit = (event: Event) => {
+    event.preventDefault();
+    document.documentElement.style.cursor = "wait";
+    vscode.postMessage({
+      type: "test",
+      data: {
+        streaming,
+        systemMessage,
+        promptTemplate,
+        instructions,
+        examples,
+        autoTechs,
+        techs,
+        model,
+      },
+    });
   };
 </script>
 
 <main class="flex-col">
   <vscode-dropdown on:change={onPresetDropdownChange}>
     {#each presets as preset}
-      <vscode-option
-        >{preset.name}</vscode-option
-      >
+      <vscode-option>{preset.name}</vscode-option>
     {/each}
   </vscode-dropdown>
 
-  <form>
+  <form on:submit={onSubmit}>
+    <div class="flex-col">
+      <span class="label">Generate tests for the active file</span>
+      <vscode-button appearance="primary" on:click={onSubmit}>
+        Generate Tests
+      </vscode-button>
+    </div>
+      
+    <vscode-dropdown on:change={onModelDropdownChange}>
+      <vscode-option>gpt-3.5-turbo-16k</vscode-option>
+      <vscode-option>gpt-4</vscode-option>
+      <vscode-option>gpt-3.5-turbo</vscode-option>
+    </vscode-dropdown>
+
     <vscode-checkbox on:click={handleStreamingClick} checked={streaming}>Enable Streaming</vscode-checkbox>
     <vscode-text-area
       rows={5}
