@@ -23,7 +23,7 @@
     autoTechs: true
 - name: React|Jest|TypeScript
   config:
-    streaming: true;
+    streaming: true
     systemMessage: You are my unit testing assistant, you will help me write unit
       tests for the files I provide, your reply will only include the unit tests
       without any additional information, starting your response with ``` and
@@ -36,9 +36,14 @@
 
       Here is the file content:
       ```{content}```
-    instructions: null
-    techs: null
-    examples: null
+    instructions: test nstructions
+    techs:
+      - test
+    examples:
+      - fileName: test fn
+        code: test code
+        tests: test tests
+    autoTechs: true
 - name: React|Vitest|TypeScript
   config:
     systemMessage: You are my unit testing assistant, you will help me write unit
@@ -53,9 +58,15 @@
 
       Here is the file content:
       ```{content}```
-    instructions: null
-    techs: null
-    examples: null
+    instructions: test nstructions
+    techs:
+      - test
+    examples:
+      - fileName: test fn
+        code: test code
+        tests: test tests
+    streaming: true
+    autoTechs: true
 - name: Svelte|Vitest|TypeScript
   config:
     systemMessage: You are my unit testing assistant, you will help me write unit
@@ -72,4 +83,4 @@
       ```{content}```
     instructions: null
     techs: null
-    examples: null
+    examples: []

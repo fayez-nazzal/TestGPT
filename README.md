@@ -19,7 +19,9 @@ By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the op
 
 <br />
 
-## Installation 
+<h2>    <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="24px" height="24px" />
+ Installation
+</h2>
 
 1. Install TestGPT by running one of these commands:
 
@@ -48,7 +50,9 @@ By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the op
 
    - **Windows:** Go to System -> Settings -> Advanced -> Environment Variables, click New under System Variables, and create a new entry with the key `OPENAI_API_KEY` and your OpenAI API Key as the value.
 
-## Usage
+<h2>    <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="24px" height="24px" />
+ Usage
+</h2>
 
 
 ### Universal / Plug and Play
@@ -62,23 +66,198 @@ testgpt -i ./component.tsx -m gpt4
 
 With more options, comes more power! You can easily specify target techs, tips, and specify a custom GPT model, along with other options. Here is a breakdown table:
 
-| Option        | Description | Required | Default Value |
-| ------------- | ----------- | -------- | ------------- |
-| `-i, --inputFile` | Path for the input file. | Yes | 
-| `-o, --outputFile` | Path for the output file. | No | \<inputFile\>.test.\<extension\>.
-| `-k, --apiKey` | OpenAI API key. | No | Taken as an environment variable.
-| `-m, --model` | GPT model to be used for generating tests. | No | gpt-3.5-turbo-16k.
-| `-s, --stream` | Stream the response using OpenAI streaming feature. | No |
-| `-t, --techs` | The technologies to be used. | No |
-| `-p, --instructions` | The instructions to be used. | No |
-| `-c, --config` | Path to config file. | No |
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<details>
+   <summary>
+   <b>--inputFile</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-i</span>
+    <span style="margin: 0 6px">|</span> 
+   <span style="color: #ff8b8b">[ Required ]</span>
+ 
+   </summary>
+   
+   <div style="margin-left: 12px">
+   Path for the input file to be tested (e.g. `./Button.tsx`).
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--outputFile</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-o</span>
+    <span style="margin: 0 6px">|</span> 
+   <span style="color: #bbbb8b">[ Default: {inputFile}.test.{extension} ]</span>
+ 
+   </summary>
+   
+   <div style="margin-left: 12px">
+   Path for the output file where the generated tests will be written (e.g. `./Button.spec.tsx`). If not provided, the output file will be the same as the input file, but with `.test` added before the extension.
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--apiKey</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-k</span>
+    <span style="margin: 0 6px">|</span> 
+   <span style="color: #bbbb8b">[ Default: OPENAI_API_KEY Env ]</span>
+ 
+   </summary>
+   
+   <div style="margin-left: 12px">
+   OpenAI API key. If not provided, it will be taken from the `OPENAI_API_KEY` environment variable. If using an API other than OpenAI, currently, this option will be ignored.
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--model</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-m</span>
+    <span style="margin: 0 6px">|</span> 
+   <span style="color: #bbbb8b">[ Default: gpt-3.5-turbo-16k ]</span>
+ 
+   </summary>
+   
+   <div style="margin-left: 12px">
+   GPT model to be used for generating tests. If using an API other than OpenAI, currently, this option will be ignored.
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--stream</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-s</span>
+   
+ 
+   </summary>
+   
+   <div style="margin-left: 12px">
+      Stream the response using OpenAI streaming feature. If using an API other than OpenAI, currently, this option will be ignored.
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--systemMessage</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-y</span>
+   </summary>
+   
+   <div style="margin-left: 12px">
+      System message to be used for generating tests.
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--promptTemplate</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-p</span>
+   </summary>
+   
+   <div style="margin-left: 12px">
+      Prompt template to be used for generating tests. You can substitute the following variables in the template:
+        <ul>
+         <li>fileName: The name of the file being tested.</li>
+         <li>content: The content of the file being tested.</li>
+         <li>techs: The technologies to be used.</li>
+         <li>instructions: General Instructions for generating tests.</li>
+        </ul>
+
+To substitute a variable, use the following syntax: `{variableName}`
+
+Here is an example:
+```js
+Please provide unit tests for the file {fileName} using {techs}
+{instructions}
+
+Please begin your response with \`\`\` and end it with \`\`\` directly.
+
+Here is the file content:
+\`\`\`{content}\`\`\`
+```
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--techs</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-t</span>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: #bbbb8b">[ Default: Auto Detected ]</span>
+   </summary>
+   
+   <div style="margin-left: 12px">
+      The technologies to be used.
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--examples</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-e</span>
+    <span style="margin: 0 6px">|</span> 
+   </summary>
+   
+   <div style="margin-left: 12px">
+      Example snippets to guide the AI test generation process.
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--moduleEndpoint</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-e</span>
+    <span style="margin: 0 6px">|</span> 
+   </summary>
+   
+   <div style="margin-left: 12px">
+      An API endpoint for a custom model to send the request to. Only use this if you have a custom model deployed and you want to use it instead of OpenAI.
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--instructions</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-n</span>
+    
+   </summary>
+   
+   <div style="margin-left: 12px">
+      General Instructions for generating tests.
+   </div>
+</details>
+
+<details>
+   <summary>
+   <b>--config</b>
+    <span style="margin: 0 6px">|</span> 
+    <span style="color: currentColor">-c</span>
+    
+   </summary>
+   
+   <div style="margin-left: 12px">
+      Path to config file.
+   </div>
+</details>
+</div>
+
+<br />
 
 Here is an example command that uses more options like those mentioned above:
 
 ```zsh
 testgpt -i ./Button.tsx -o ./Button.spec.tsx -m gpt-4 --techs "jest, testing-library" --apiKey "Your OpenAI API Key"
 ```
-
 
 ### Locally / Config-based
 
@@ -90,8 +269,8 @@ An example of a `testgpt.config.yaml` file:
    techs:
       - jest
       - react-testing-library
-   instructions:
-      - Wrap test groups in 'describe' blocks
+   instructions: |-
+      Wrap test groups in 'describe' blocks
    examples:
       - fileName: file1.tsx
         code: <code for file1.tsx>
@@ -105,4 +284,10 @@ An example of a `testgpt.config.yaml` file:
 
 ## License
 
-This tool is licensed under the MIT License. Feel free to use it however you like, and contributions are always welcome 😊
+This software is licensed under the MIT License, which permits you to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the following conditions:
+
+- The above copyright notice and this permission notice shall be included in all copies or substantial portions of the software.
+- The software is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement.
+- In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the software or the use or other dealings in the software.
+
+Please feel free to use this software in any way you see fit, and contributions are always welcome :)
