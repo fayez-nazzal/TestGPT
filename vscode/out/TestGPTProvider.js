@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestGPTWebviewProvider = void 0;
 const vscode_1 = require("vscode");
 const utils_1 = require("./utils");
+const yaml_1 = require("yaml");
+const fs = require("fs");
 class TestGPTWebviewProvider {
     /**
      * @param panel A reference to the webview panel
@@ -14,7 +16,6 @@ class TestGPTWebviewProvider {
     }
     resolveWebviewView(webviewView, context, token) {
         this._view = webviewView;
-        this._setWebviewMessageListener(webviewView.webview);
         webviewView.webview.options = {
             enableScripts: true,
             localResourceRoots: [
@@ -23,15 +24,7 @@ class TestGPTWebviewProvider {
             ],
         };
         webviewView.webview.html = this._getWebviewContent(webviewView.webview);
-        webviewView.webview.onDidReceiveMessage((data) => {
-            var _a;
-            switch (data.type) {
-                case "colorSelected": {
-                    (_a = vscode_1.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.insertSnippet(new vscode_1.SnippetString(`#${data.value}`));
-                    break;
-                }
-            }
-        });
+        this._setWebviewMessageListener(webviewView.webview);
     }
     /**
      * Cleans up and disposes of webview resources when the webview panel is closed.
@@ -59,19 +52,12 @@ class TestGPTWebviewProvider {
      */
     _getWebviewContent(webview) {
         // The CSS file from the React build output
-        const stylesUri = (0, utils_1.getUri)(webview, this._extensionUri, [
-            "webview-ui",
-            "public",
-            "build",
-            "bundle.css",
-        ]);
+        const stylesUri = (0, utils_1.getUri)(webview, this._extensionUri, ["webview-ui", "public", "build", "bundle.css"]);
         // The JS file from the React build output
-        const scriptUri = (0, utils_1.getUri)(webview, this._extensionUri, [
-            "webview-ui",
-            "public",
-            "build",
-            "bundle.js",
-        ]);
+        const scriptUri = (0, utils_1.getUri)(webview, this._extensionUri, ["webview-ui", "public", "build", "bundle.js"]);
+        // Read yaml file from resources folder
+        const presetsUri = (0, utils_1.getUri)(webview, this._extensionUri, ["resources", "presets.yaml"]);
+        const presets = (0, yaml_1.parse)(fs.readFileSync(presetsUri.fsPath, "utf8"));
         const nonce = (0, utils_1.getNonce)();
         // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
         return /*html*/ `
@@ -83,6 +69,10 @@ class TestGPTWebviewProvider {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
+          <script nonce="${nonce}">
+            window.presets = ${JSON.stringify(presets)};
+            window.activePreset = ${JSON.stringify(presets[0])};
+          </script>
           <script defer nonce="${nonce}" src="${scriptUri}"></script>
         </head>
         <body>
@@ -98,7 +88,16 @@ class TestGPTWebviewProvider {
      * @param context A reference to the extension context
      */
     _setWebviewMessageListener(webview) {
-        webview.onDidReceiveMessage((message) => { }, undefined, this._disposables);
+        webview.onDidReceiveMessage((message) => {
+            if (message.type === "preset") {
+                const presetsUri = (0, utils_1.getUri)(webview, this._extensionUri, ["resources", "presets.yaml"]);
+                const presets = (0, yaml_1.parse)(fs.readFileSync(presetsUri.fsPath, "utf8"));
+                const presetIndex = presets.findIndex((p) => p.name === message.data.name);
+                presets[presetIndex] = message.data;
+                const strPresets = (0, yaml_1.stringify)(presets);
+                fs.writeFileSync(presetsUri.fsPath, strPresets);
+            }
+        }, undefined, this._disposables);
     }
 }
 exports.TestGPTWebviewProvider = TestGPTWebviewProvider;
