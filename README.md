@@ -9,7 +9,16 @@ Your AI testing companion that writes tests on your behalf, automated to get you
 
 By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the option to use gpt-4, or any other model you want.
 
-> 🤖 A Visual Studio Code Extension is available! Check it in the <strong>[VSCode Marketplace](https://marketplace.visualstudio.com/items?itemName=FayezNazzal.testgpt)</strong>
+<div>
+    <a href="https://www.loom.com/share/9eab4b1c35194a8190daffb26fcb2cff">
+      <p><img style="padding: 0 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" />A Sneak Peek for the upcoming VSCode Extension<img style="padding: 0 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" /></p>
+    </a>
+    <a href="https://www.loom.com/share/9eab4b1c35194a8190daffb26fcb2cff">
+      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/9eab4b1c35194a8190daffb26fcb2cff-with-play.gif">
+    </a>
+</div>
+
+<hr />
 
 <br />
 
@@ -55,7 +64,7 @@ By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the op
 </h2>
 
 
-### Universal / Plug and Play
+### <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" /> Universal / Plug and Play
 
 Here's a simple form of a test generation command:
 
@@ -259,7 +268,7 @@ Here is an example command that uses more options like those mentioned above:
 testgpt -i ./Button.tsx -o ./Button.spec.tsx -m gpt-4 --techs "jest, testing-library" --apiKey "Your OpenAI API Key"
 ```
 
-### Locally / Config-based
+### <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" /> Locally / Config-based
 
 For extra flexibility, having `testgpt.config.yaml` at your project's root allows for running shorter commands, quicker, and more friendly for repetitive usage.
 
@@ -282,7 +291,7 @@ An example of a `testgpt.config.yaml` file:
 
 > More and longer examples enhance the test quality. This will be more possible with high-context length models like gpt-3.5-turbo-16k or gpt-4-32k.
 
-## License
+## <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="24px" height="24px" /> License
 
 This software is licensed under the MIT License, which permits you to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the software, subject to the following conditions:
 
