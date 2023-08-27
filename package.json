@@ -41,7 +41,7 @@
     "commander": "^10.0.0",
     "openai": "^3.2.1",
     "tree-sitter-cli": "^0.20.7",
-    "yaml": "^2.2.1"
+    "yaml": "^2.3.1"
   },
   "repository": "https://github.com/fayez-nazzal/testgpt",
   "bugs": "https://github.com/fayez-nazzal/testgpt/issues"

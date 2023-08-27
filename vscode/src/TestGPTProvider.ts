@@ -1,18 +1,16 @@
 import {
   Disposable,
   Webview,
-  WebviewPanel,
   window,
   Uri,
-  ViewColumn,
   WebviewViewProvider,
   CancellationToken,
   WebviewView,
   WebviewViewResolveContext,
-  SnippetString,
 } from "vscode";
 import { getUri, getNonce } from "./utils";
-
+import { parse, stringify } from "yaml";
+import * as fs from "fs";
 export class TestGPTWebviewProvider implements WebviewViewProvider {
   public static currentPanel: TestGPTWebviewProvider | undefined;
   public static readonly viewType = "testgpt";
@@ -35,7 +33,6 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
     token: CancellationToken
   ): void | Thenable<void> {
     this._view = webviewView;
-    this._setWebviewMessageListener(webviewView.webview);
 
     webviewView.webview.options = {
       enableScripts: true,
@@ -47,16 +44,7 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
 
     webviewView.webview.html = this._getWebviewContent(webviewView.webview);
 
-    webviewView.webview.onDidReceiveMessage((data) => {
-      switch (data.type) {
-        case "colorSelected": {
-          window.activeTextEditor?.insertSnippet(
-            new SnippetString(`#${data.value}`)
-          );
-          break;
-        }
-      }
-    });
+    this._setWebviewMessageListener(webviewView.webview);
   }
 
   /**
@@ -87,20 +75,14 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
    */
   private _getWebviewContent(webview: Webview) {
     // The CSS file from the React build output
-    const stylesUri = getUri(webview, this._extensionUri, [
-      "webview-ui",
-      "public",
-      "build",
-      "bundle.css",
-    ]);
+    const stylesUri = getUri(webview, this._extensionUri, ["webview-ui", "public", "build", "bundle.css"]);
 
     // The JS file from the React build output
-    const scriptUri = getUri(webview, this._extensionUri, [
-      "webview-ui",
-      "public",
-      "build",
-      "bundle.js",
-    ]);
+    const scriptUri = getUri(webview, this._extensionUri, ["webview-ui", "public", "build", "bundle.js"]);
+
+    // Read yaml file from resources folder
+    const presetsUri = getUri(webview, this._extensionUri, ["resources", "presets.yaml"]);
+    const presets = parse(fs.readFileSync(presetsUri.fsPath, "utf8"));
 
     const nonce = getNonce();
 
@@ -112,8 +94,14 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
           <title>TestGPT</title>
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${
+            webview.cspSource
+          }; script-src 'nonce-${nonce}';">
           <link rel="stylesheet" type="text/css" href="${stylesUri}">
+          <script nonce="${nonce}">
+            window.presets = ${JSON.stringify(presets)};
+            window.activePreset = ${JSON.stringify(presets[0])};
+          </script>
           <script defer nonce="${nonce}" src="${scriptUri}"></script>
         </head>
         <body>
@@ -131,7 +119,17 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
    */
   private _setWebviewMessageListener(webview: Webview) {
     webview.onDidReceiveMessage(
-      (message: any) => {},
+      (message: any) => {
+        if (message.type === "preset") {
+          const presetsUri = getUri(webview, this._extensionUri, ["resources", "presets.yaml"]);
+          const presets = parse(fs.readFileSync(presetsUri.fsPath, "utf8"));
+          const presetIndex = presets.findIndex((p: any) => p.name === message.data.name);
+          presets[presetIndex] = message.data;
+          const strPresets = stringify(presets);
+
+          fs.writeFileSync(presetsUri.fsPath, strPresets);
+        }
+      },
       undefined,
       this._disposables
     );
