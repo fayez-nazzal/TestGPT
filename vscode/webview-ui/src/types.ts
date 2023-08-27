@@ -1,6 +1,7 @@
 export interface IPreset {
   name: string;
   config: {
+    model: string;
     streaming: boolean;
     systemMessage: string;
     promptTemplate: string;

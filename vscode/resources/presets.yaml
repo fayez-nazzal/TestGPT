@@ -1,28 +1,33 @@
 - name: Default Preset
   config:
+    model: gpt-3.5-turbo-16k
     streaming: true
     systemMessage: You are my unit testing assistant, you will help me write unit
       tests for the files I provide, your reply will only include the unit tests
-      without any additional information, starting your response with ``` and
-      ending it with ``` directly will help me understand your response better.
-    promptTemplate: |-
+      without markdown or any additional information, starting your response
+      with the code text directly will help me understand your response better.
+    promptTemplate: >-
       Please provide unit tests for the file {fileName} using {techs}
+
       {instructions}
 
-      Please begin your response with ``` and end it with ``` directly.
+
+      Please begin your response with the text directly without markdown, don't use the digit "`" in your response.
+
+
+      Give me your response as text, no markdown please. no code snippets.
 
       Here is the file content:
-      ```{content}```
-    instructions: test nstructions
+
+      {content}
+    instructions: Follow best practices
     techs:
       - test
-    examples:
-      - fileName: test fn
-        code: test code
-        tests: test tests
+    examples: []
     autoTechs: true
 - name: React|Jest|TypeScript
   config:
+    model: gpt-3.5-turbo
     streaming: true
     systemMessage: You are my unit testing assistant, you will help me write unit
       tests for the files I provide, your reply will only include the unit tests
@@ -46,6 +51,7 @@
     autoTechs: true
 - name: React|Vitest|TypeScript
   config:
+    model: gpt-3.5-turbo
     systemMessage: You are my unit testing assistant, you will help me write unit
       tests for the files I provide, your reply will only include the unit tests
       without any additional information, starting your response with ``` and
@@ -69,6 +75,7 @@
     autoTechs: true
 - name: Svelte|Vitest|TypeScript
   config:
+    model: gpt-3.5-turbo
     systemMessage: You are my unit testing assistant, you will help me write unit
       tests for the files I provide, your reply will only include the unit tests
       without any additional information, starting your response with ``` and

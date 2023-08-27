@@ -11,6 +11,8 @@ import {
 import { getUri, getNonce } from "./utils";
 import { parse, stringify } from "yaml";
 import * as fs from "fs";
+import * as cp from "child_process";
+
 export class TestGPTWebviewProvider implements WebviewViewProvider {
   public static currentPanel: TestGPTWebviewProvider | undefined;
   public static readonly viewType = "testgpt";
@@ -128,50 +130,50 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
           const strPresets = stringify(presets);
 
           fs.writeFileSync(presetsUri.fsPath, strPresets);
-        }
-
-        if (message.type === "test") {
-          // get active file in the editor
-          const activeEditor = window.activeTextEditor;
-          if (!activeEditor) {
-            window.showErrorMessage("No active editor");
-            return;
-          }
-
+        } else if (message.type === "test") {
           // get active file path
-          const activeFilePath = activeEditor.document.fileName;
+          const activeFilePath = window.visibleTextEditors[0]?.document.fileName;
           if (!activeFilePath) {
             window.showErrorMessage("No active file");
             return;
           }
 
-          const defaultOutputFile = activeFilePath.replace(/\.[^/.]+$/, (ext) => `spec${ext}`);
-          const outputFile = message.outputFile || defaultOutputFile;
+          // use input file name only
+          const inputFile = activeFilePath.split("/").pop();
 
-          const model = message.model;
-          const streaming = message.streaming;
-          const systemMessage = message.systemMessage;
-          const promptTemplate = message.promptTemplate;
-          const instructions = message.instructions;
-          const techs = message.techs.join(", ");
-          const examples = JSON.stringify(message.examples);
-          const key = "";
+          const defaultOutputFile = activeFilePath.replace(/\.[^/.]+$/, (ext) => `.spec${ext}`);
+          const outputFilePath = message.data.outputFile || defaultOutputFile;
+          const outputFile = outputFilePath.split("/").pop();
 
-          if (!outputFile || !systemMessage || !promptTemplate || !instructions || !techs || !examples) {
+          const stringifyData = (data: any) => {
+            return JSON.stringify(data).replace(/"/g, '\\"').replace(/`/g, "\\`");
+          };
+
+          const model = stringifyData(message.data.model);
+          const streaming = stringifyData(message.data.streaming);
+          const systemMessage = stringifyData(message.data.systemMessage);
+          const promptTemplate = stringifyData(message.data.promptTemplate);
+          const instructions = stringifyData(message.data.instructions);
+          const techs = message.data.autoTechs ? "" : stringifyData(message.techs.join(", "));
+          const examples = stringifyData(message.data.examples);
+          const key = "s";
+
+          if (!outputFile || !systemMessage || !promptTemplate || !examples) {
             window.showErrorMessage("Missing required fields");
             return;
           }
 
-          const command = `npx --yes testgpt@latest -i "${activeFilePath}" -o "${outputFile}" ${
-            streaming ? "-s" : ""
-          } -p "${promptTemplate}" -m "${model}" -k "${key}" -t "${techs}" -e "${examples.replace(
-            /"/g,
-            '\\"'
-          )}" -y "${systemMessage}" -n "${instructions}"`;
-
-          const terminal = window.createTerminal("TestGPT");
+          const command = `npx --yes testgpt@latest -i "${inputFile}" -o "${outputFile}" ${streaming ? "-s" : "" } -p "${promptTemplate}" ${techs ? `"${techs}"` : ""} -x "${examples}" -y "${systemMessage}" -n "${instructions}"`;
+          
+          const terminal = window.createTerminal("TestGPT Terminal");
           terminal.sendText(command);
           terminal.show();
+
+          if (streaming) {
+            setTimeout(() => {
+              window.showTextDocument(Uri.file(outputFilePath));
+            }, 1200);
+          }
         }
       },
       undefined,
