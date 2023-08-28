@@ -7,29 +7,38 @@
 
 Your AI testing companion that writes tests on your behalf, automated to get you to build and ship faster without sacrificing tests.
 
-By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the option to use gpt-4, or any other model you want.
+By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the option to use gpt-4, gpt-3.5-turbo, or even use your own AI model!
 
-<div>
-    <a href="https://www.loom.com/share/9eab4b1c35194a8190daffb26fcb2cff">
-      <p><img style="padding: 0 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" />A Sneak Peek for the upcoming VSCode Extension<img style="padding: 0 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" /></p>
-    </a>
-    <a href="https://www.loom.com/share/9eab4b1c35194a8190daffb26fcb2cff">
-      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/9eab4b1c35194a8190daffb26fcb2cff-with-play.gif">
-    </a>
-</div>
+<h2 style="display: flex; gap: 4px;">
+   <img style="padding: 0 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" />
+   <span>A Sneak Peek for the upcoming VSCode Extension</span>
+   <img style="padding: 0 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" />
+</h2>
 
-<hr />
+<p>
+   The extension is currently being developed and will soon have additional features. By default, it will be much simpler and will come with recommended configurations for basic use cases.
+</p>
+
+<a href="https://www.loom.com/share/9eab4b1c35194a8190daffb26fcb2cff">
+   <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/9eab4b1c35194a8190daffb26fcb2cff-with-play.gif">
+</a>
 
 <br />
 
-<div align="center">
-   <img src="./show.gif" alt="Show" />
-</div>
+<h2 style="display: flex; gap: 4px;">
+   <img style="padding: 0 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" />
+   <span>TestGPT CLI Tool</span>
+   <img style="padding: 0 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" />
+</h2>
+
+This tool serves as the back-end for the VSCode extension. <b>You don't need to install or use it separately, as the extension will handle everything for you</b>. However, if you wish to create your own extension for integration with your preferred text editor, feel free to do so. PRs are welcome!
+
+<img src="./show.gif" alt="Show" />
 
 <br />
 
 <h2>    <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="24px" height="24px" />
- Installation
+ Installing the CLI tool
 </h2>
 
 1. Install TestGPT by running one of these commands:
@@ -60,13 +69,13 @@ By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the op
    - **Windows:** Go to System -> Settings -> Advanced -> Environment Variables, click New under System Variables, and create a new entry with the key `OPENAI_API_KEY` and your OpenAI API Key as the value.
 
 <h2>    <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="24px" height="24px" />
- Usage
+ Using the CLI Toool
 </h2>
 
 
 ### <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="16px" height="16px" /> Universal / Plug and Play
 
-Here's a simple form of a test generation command:
+Here's a simple example of a test generation command:
 
 ```zsh
 testgpt -i ./component.tsx -m gpt4
