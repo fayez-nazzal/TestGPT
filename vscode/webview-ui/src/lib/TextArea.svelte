@@ -3,6 +3,7 @@
 
   export let value: string;
   export let name: string;
+  export let label: string;
   export let placeholder: string;
   export let setValue: (value: string) => void;
   export let rows = 5;
@@ -12,6 +13,6 @@
   };
 </script>
 
-<vscode-text-area rows={rows} {name} {value} on:input={onChange} {placeholder}>
-  System Message
+<vscode-text-area {rows} {name} {value} on:input={onChange} {placeholder}>
+  {label}
 </vscode-text-area>

@@ -46,25 +46,6 @@
     streaming = !streaming;
   };
 
-  const onExampleFileNameChange = (
-    event: InputEvent & { currentTarget: HTMLTextAreaElement },
-    index: number
-  ) => {
-    examples[index].fileName = event.currentTarget.value;
-  };
-
-  const onExampleCodeChange = (event: InputEvent & { currentTarget: HTMLTextAreaElement }, index: number) => {
-    examples[index].code = event.currentTarget.value;
-  };
-
-  const onExampleTestsChange = (
-    event: InputEvent & { currentTarget: HTMLTextAreaElement },
-    index: number
-  ) => {
-    examples[index].tests = event.currentTarget.value;
-    examples = [...examples];
-  };
-
   let model = activePreset.config.model;
 
   $: {
@@ -131,27 +112,24 @@
       value={systemMessage}
       setValue={(value) => (systemMessage = value)}
       placeholder="Base system message sent to the AI model"
-    >
-      System Message
-    </TextArea>
+      label="System Message"
+    />
     <TextArea
       rows={7}
       name="promptTemplate"
       value={promptTemplate}
       setValue={(value) => (promptTemplate = value)}
       placeholder="The prompt sent to the AI model"
-    >
-      Prompt Template
-    </TextArea>
+      label="Prompt Template"
+    />
     <TextArea
       rows={7}
       name="instructions"
       value={instructions}
       setValue={(value) => (instructions = value)}
       placeholder="General instrutions for writing tests"
-    >
-      Instructions
-    </TextArea>
+      label="Instructions"
+    />
     <div class="flex-col">
       <span class="label">Techs</span>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -205,26 +183,33 @@
         {#if i > 0}
           <vscode-divider role="separator" />
         {/if}
-        <vscode-text-field
+        
+        <TextArea
+          rows={1}
           name="fileName-{i}"
           placeholder="File name containing the example code"
           value={example.fileName}
-          on:input={(e) => onExampleFileNameChange(e, i)}>File Name</vscode-text-field
-        >
-        <vscode-text-area
+          setValue={(val) => (examples[i].fileName = val)}
+          label="File Name"
+        />
+
+        <TextArea
           rows={10}
           name="code-{i}"
           placeholder="Example code snippet"
           value={example.code}
-          on:input={(e) => onExampleCodeChange(e, i)}>Code</vscode-text-area
-        >
-        <vscode-text-area
+          setValue={(val) => (examples[i].code = val)}
+          label="Code"
+        />
+
+        <TextArea
           rows={10}
           name="tests-{i}"
           placeholder="Example tests output"
           value={example.tests}
-          on:input={(e) => onExampleTestsChange(e, i)}>Tests</vscode-text-area
-        >
+          setValue={(val) => (examples[i].tests = val)}
+          label="Tests"
+        />
       {/each}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <vscode-button tabindex="0" role="button" on:click={onNewExampleClick}>Add New Example</vscode-button>
