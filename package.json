@@ -39,7 +39,7 @@
     "axios": "^1.3.4",
     "chalk": "^4.1.0",
     "commander": "^10.0.0",
-    "openai": "^3.2.1",
+    "openai": "^4.4.0",
     "tree-sitter-cli": "^0.20.7",
     "yaml": "^2.3.1"
   },

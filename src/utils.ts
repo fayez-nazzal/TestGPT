@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import fs from "fs";
 import path from "path";
-import { Configuration, CreateChatCompletionRequest, OpenAIApi } from "openai";
+import OpenAI from "openai";
 import { parse } from "yaml";
 import { ERole, IExample, IMessage, IGetPromptArgs } from "./types";
 
@@ -134,19 +134,14 @@ export const readYamlFile = (path: string) => {
 export type IModel = "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-4";
 
 export const initOpenAI = async (apiKey: string) => {
-  const configuration = new Configuration({
+  const openai = new OpenAI({
     apiKey: apiKey,
   });
-
-  const openai = new OpenAIApi(configuration);
 
   return openai;
 };
 
-export type ICompletionRequest = CreateChatCompletionRequest;
-
-export const getCompletionRequest = (
-  model: IModel,
+export const getMessages = (
   systemMessage: string | undefined,
   prompt: string,
   examples: IMessage[]
@@ -154,67 +149,64 @@ export const getCompletionRequest = (
   systemMessage ??=
     "You are my unit testing assistant, you will help me write unit tests for the files I provide, your reply will only include the unit tests without any additional information, starting your response with ``` and ending it with ``` directly will help me understand your response better.";
 
-  return {
-    model,
-    messages: [
-      {
-        role: ERole.System,
-        content: systemMessage,
-      },
-      ...examples,
-      {
-        role: ERole.User,
-        content: prompt,
-      },
-    ],
-  } as ICompletionRequest;
+  return [
+    {
+      role: ERole.System,
+      content: systemMessage,
+    },
+    ...examples,
+    {
+      role: ERole.User,
+      content: prompt,
+    },
+  ];
 };
 
-export const getTestContent = async (
-  completionRequest: ICompletionRequest,
-  openai: OpenAIApi
-) => {
-  const response = await openai.createChatCompletion(completionRequest);
+interface IGetTestContentArgs {
+  model: IModel;
+  messages: IMessage[];
+  openai: OpenAI;
+}
+
+export const getTestContent = async ({
+  model,
+  messages,
+  openai,
+}: IGetTestContentArgs) => {
+  const response = await openai.chat.completions.create({
+    model,
+    messages,
+  });
 
   // remove lines that start with ``` (markdown code block)
   const regex = /^```.*$/gm;
-  return response.data.choices[0].message?.content?.replace(regex, "");
+  return response.choices[0].message?.content?.replace(regex, "");
 };
 
-export const streamTestContent = async (
-  completionRequest: ICompletionRequest,
-  openai: OpenAIApi,
-  onToken: (token: string) => void
-) => {
-  const response = await openai.createChatCompletion(
-    {
-      ...completionRequest,
-      stream: true,
-    },
-    {
-      responseType: "stream",
-    }
-  );
+export interface IStreamTestContentArgs {
+  model: IModel;
+  messages: IMessage[];
+  openai: OpenAI;
+  onToken: (token: string) => void;
+}
 
-  for await (const chunk of (response as any).data) {
-    const lines = chunk
-      .toString("utf8")
-      .split("\n")
-      .filter((line) => line.trim().startsWith("data: "));
+export const streamTestContent = async ({
+  model,
+  messages,
+  openai,
+  onToken,
+}: IStreamTestContentArgs) => {
+  const response = await openai.chat.completions.create({
+    model,
+    messages,
+    stream: true,
+  });
 
-    for (const line of lines) {
-      const message = line.replace(/^data: /, "");
+  for await (const part of response) {
+    const content = part.choices[0].delta.content;
 
-      if (message === "[DONE]") {
-        return;
-      }
-
-      const json = JSON.parse(message);
-      const token = json.choices[0].delta.content;
-
-      if (token) {
-        onToken(token);
-      }
+    if (content) {
+      onToken(content);
     }
   }
 };
@@ -287,21 +279,27 @@ export const autoTest = async ({
     return;
   }
 
-  const completionRequest = getCompletionRequest(
-    model,
-    systemMessage,
-    prompt,
-    exampleMessages
-  );
+  const messages = getMessages(systemMessage, prompt, exampleMessages);
 
   const openai = await initOpenAI(apiKey);
 
   if (stream) {
-    await streamTestContent(completionRequest, openai, (token) => {
+    const onToken = (token) => {
       writeToFile(outputFile, token, true);
+    };
+
+    await streamTestContent({
+      openai,
+      model,
+      messages,
+      onToken,
     });
   } else {
-    const testContent = await getTestContent(completionRequest, openai);
+    const testContent = await getTestContent({
+      openai,
+      model,
+      messages,
+    });
 
     if (!testContent) {
       console.error(chalk.red("Error generating tests - No tests content"));
