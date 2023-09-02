@@ -3,6 +3,7 @@
   import { vscode } from "./utilities/vscode";
   import type { IPreset } from "./types";
   import type { EventHandler } from "svelte/elements";
+  import TextArea from "./lib/TextArea.svelte";
 
   provideVSCodeDesignSystem().register(allComponents);
 
@@ -13,19 +14,8 @@
   };
 
   let systemMessage = activePreset.config.systemMessage;
-  const handleSystemMessageChange: EventHandler<InputEvent, HTMLTextAreaElement> = (event) => {
-    systemMessage = event.currentTarget.value;
-  };
-
   let promptTemplate = activePreset.config.promptTemplate;
-  const handlePromptTemplateChange: EventHandler<InputEvent, HTMLTextAreaElement> = (event) => {
-    promptTemplate = event.currentTarget.value;
-  };
-
   let instructions = activePreset.config.instructions;
-  const handleInstructionsChange: EventHandler<InputEvent, HTMLTextAreaElement> = (event) => {
-    instructions = event.currentTarget.value;
-  };
 
   let autoTechs = activePreset.config.autoTechs;
   const handleAutoTestClick = () => {
@@ -82,7 +72,6 @@
 
   $: {
     activePreset.config.streaming = streaming;
-    activePreset.config.systemMessage = systemMessage;
     activePreset.config.promptTemplate = promptTemplate;
     activePreset.config.instructions = instructions;
     activePreset.config.examples = examples;
@@ -147,33 +136,32 @@
     </vscode-dropdown>
 
     <vscode-checkbox on:click={handleStreamingClick} checked={streaming}>Enable Streaming</vscode-checkbox>
-    <vscode-text-area
-      rows={5}
+    <TextArea
       name="systemMessage"
       value={systemMessage}
-      on:input={handleSystemMessageChange}
+      setValue={(value) => (systemMessage = value)}
       placeholder="Base system message sent to the AI model"
     >
       System Message
-    </vscode-text-area>
-    <vscode-text-area
+    </TextArea>
+    <TextArea
       rows={7}
       name="promptTemplate"
       value={promptTemplate}
-      on:input={handlePromptTemplateChange}
+      setValue={(value) => (promptTemplate = value)}
       placeholder="The prompt sent to the AI model"
     >
       Prompt Template
-    </vscode-text-area>
-    <vscode-text-area
+    </TextArea>
+    <TextArea
       rows={7}
       name="instructions"
       value={instructions}
-      on:input={handleInstructionsChange}
+      setValue={(value) => (instructions = value)}
       placeholder="General instrutions for writing tests"
     >
       Instructions
-    </vscode-text-area>
+    </TextArea>
     <div class="flex-col">
       <span class="label">Techs</span>
       <!-- svelte-ignore a11y-click-events-have-key-events -->
