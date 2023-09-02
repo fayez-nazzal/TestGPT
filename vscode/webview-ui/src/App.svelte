@@ -4,6 +4,7 @@
   import type { IPreset } from "./types";
   import type { EventHandler } from "svelte/elements";
   import TextArea from "./lib/TextArea.svelte";
+  import Dropdown from "./lib/Dropdown.svelte";
 
   provideVSCodeDesignSystem().register(allComponents);
 
@@ -66,13 +67,10 @@
 
   let model = activePreset.config.model;
 
-  const onModelDropdownChange: EventHandler<any, any> = (event) => {
-    model = event.currentTarget.value;
-  };
-
   $: {
     activePreset.config.streaming = streaming;
     activePreset.config.promptTemplate = promptTemplate;
+    activePreset.config.systemMessage = systemMessage;
     activePreset.config.instructions = instructions;
     activePreset.config.examples = examples;
     activePreset.config.autoTechs = autoTechs;
@@ -85,8 +83,8 @@
     });
   }
 
-  const onPresetDropdownChange: EventHandler<any, any> = (event) => {
-    activePreset = presets.find((p) => p.name === event.currentTarget.value)!;
+  const onPresetChange = (preset: string) => {
+    activePreset = presets.find((p) => p.name === preset)!;
     streaming = activePreset.config.streaming;
     systemMessage = activePreset.config.systemMessage;
     promptTemplate = activePreset.config.promptTemplate;
@@ -117,11 +115,7 @@
 </script>
 
 <main class="flex-col">
-  <vscode-dropdown on:change={onPresetDropdownChange}>
-    {#each presets as preset}
-      <vscode-option>{preset.name}</vscode-option>
-    {/each}
-  </vscode-dropdown>
+  <Dropdown options={presets.map((p) => p.name)} setValue={onPresetChange} />
 
   <form on:submit={onSubmit}>
     <div class="flex-col">
@@ -129,11 +123,7 @@
       <vscode-button appearance="primary" on:click={onSubmit}> Generate Tests </vscode-button>
     </div>
 
-    <vscode-dropdown on:change={onModelDropdownChange}>
-      <vscode-option>gpt-3.5-turbo-16k</vscode-option>
-      <vscode-option>gpt-4</vscode-option>
-      <vscode-option>gpt-3.5-turbo</vscode-option>
-    </vscode-dropdown>
+    <Dropdown options={["gpt-3.5-turbo-16k", "gpt-3.5-turbo", "gpt-4"]} setValue={(val) => (model = val)} />
 
     <vscode-checkbox on:click={handleStreamingClick} checked={streaming}>Enable Streaming</vscode-checkbox>
     <TextArea
