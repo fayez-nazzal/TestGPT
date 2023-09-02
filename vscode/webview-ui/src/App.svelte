@@ -13,13 +13,13 @@
   };
 
   let systemMessage = activePreset.config.systemMessage;
-  const handleSystemMessageChange = (event: CustomEvent) => {
-    systemMessage = event.detail.value;
+  const handleSystemMessageChange: EventHandler<InputEvent, HTMLTextAreaElement> = (event) => {
+    systemMessage = event.currentTarget.value;
   };
 
   let promptTemplate = activePreset.config.promptTemplate;
-  const handlePromptTemplateChange = (event: CustomEvent) => {
-    promptTemplate = event.detail.value;
+  const handlePromptTemplateChange: EventHandler<InputEvent, HTMLTextAreaElement> = (event) => {
+    promptTemplate = event.currentTarget.value;
   };
 
   let instructions = activePreset.config.instructions;
@@ -107,7 +107,7 @@
     techs = activePreset.config.techs as string[];
     model = activePreset.config.model;
   };
-  
+
   const onSubmit = (event: Event) => {
     event.preventDefault();
     document.documentElement.style.cursor = "wait";
@@ -137,11 +137,9 @@
   <form on:submit={onSubmit}>
     <div class="flex-col">
       <span class="label">Generate tests for the active file</span>
-      <vscode-button appearance="primary" on:click={onSubmit}>
-        Generate Tests
-      </vscode-button>
+      <vscode-button appearance="primary" on:click={onSubmit}> Generate Tests </vscode-button>
     </div>
-      
+
     <vscode-dropdown on:change={onModelDropdownChange}>
       <vscode-option>gpt-3.5-turbo-16k</vscode-option>
       <vscode-option>gpt-4</vscode-option>
