@@ -5,6 +5,7 @@
   import type { EventHandler } from "svelte/elements";
   import TextArea from "./lib/TextArea.svelte";
   import Dropdown from "./lib/Dropdown.svelte";
+  import RemoveButton from "./lib/RemoveButton.svelte";
 
   provideVSCodeDesignSystem().register(allComponents);
 
@@ -145,26 +146,7 @@
           <vscode-tag>
             <div class="flex items-center">
               {tech}
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <div
-                role="button"
-                tabindex="0"
-                class="remove-button flex items-center"
-                on:click={() => (techs = techs.filter((t) => t !== tech))}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  ><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg
-                >
-              </div>
+              <RemoveButton onRemove={() => (techs = techs.filter((t) => t !== tech))} />
             </div>
           </vscode-tag>
         {/each}
@@ -183,7 +165,7 @@
         {#if i > 0}
           <vscode-divider role="separator" />
         {/if}
-        
+
         <TextArea
           rows={1}
           name="fileName-{i}"
