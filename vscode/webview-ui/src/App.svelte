@@ -154,9 +154,9 @@
       <div class="flex items-end {autoTechs && 'disabled-group'}">
         <vscode-text-field disabled={autoTechs} on:input={handleTechInputChange} value={techInput} />
         <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <vscode-button role="button" tabindex="0" disabled={autoTechs} on:click={handleAddTechClick}
-          >Add</vscode-button
-        >
+        <vscode-button role="button" tabindex="0" disabled={autoTechs} on:click={handleAddTechClick}>
+          Add
+        </vscode-button>
       </div>
     </div>
     <div class="flex-col">

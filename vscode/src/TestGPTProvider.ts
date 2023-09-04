@@ -1,3 +1,4 @@
+/* eslint-disable curly */
 import {
   Disposable,
   Webview,
@@ -122,6 +123,7 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
   private _setWebviewMessageListener(webview: Webview) {
     webview.onDidReceiveMessage(
       (message: any) => {
+        console.log("message", message);
         if (message.type === "preset") {
           const presetsUri = getUri(webview, this._extensionUri, ["resources", "presets.yaml"]);
           const presets = parse(fs.readFileSync(presetsUri.fsPath, "utf8"));
@@ -149,30 +151,54 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
             return JSON.stringify(data).replace(/"/g, '\\"').replace(/`/g, "\\`");
           };
 
-          const model = stringifyData(message.data.model);
-          const streaming = stringifyData(message.data.streaming);
+          const model = message.data.model;
+          const streaming = message.data.streaming;
           const systemMessage = stringifyData(message.data.systemMessage);
           const promptTemplate = stringifyData(message.data.promptTemplate);
           const instructions = stringifyData(message.data.instructions);
           const techs = message.data.autoTechs ? "" : stringifyData(message.techs.join(", "));
           const examples = stringifyData(message.data.examples);
-          const key = "s";
+          const key = process.env.OPENAI_API_KEY;
 
-          if (!outputFile || !systemMessage || !promptTemplate || !examples) {
+          if (!model || !outputFile || !systemMessage || !promptTemplate || !examples || !key) {
+            console.error("Missing required fields");
             window.showErrorMessage("Missing required fields");
             return;
           }
 
-          const command = `npx --yes testgpt@latest -i "${inputFile}" -o "${outputFile}" ${streaming ? "-s" : "" } -p "${promptTemplate}" ${techs ? `"${techs}"` : ""} -x "${examples}" -y "${systemMessage}" -n "${instructions}"`;
-          
+          let command = `npx --yes testgpt@latest`;
+
+          if (inputFile) command += ` -i "${inputFile}"`;
+
+          if (outputFile) command += ` -o "${outputFile}"`;
+
+          if (model) command += ` -m "${model}"`;
+
+          if (key) command += ` -k "${key}"`;
+
+          if (systemMessage) command += ` -y "${systemMessage}"`;
+
+          if (promptTemplate) command += ` -p "${promptTemplate}"`;
+
+          if (techs) command += ` -t "${techs}"`;
+
+          if (examples) command += ` -x "${examples}"`;
+
+          if (streaming) command += ` -s`;
+
+          if (instructions) command += ` -n "${instructions}"`;
+
+          // create output file if it doesn't exist
+          if (!fs.existsSync(outputFilePath)) {
+            fs.writeFileSync(outputFilePath, "");
+          }
+
           const terminal = window.createTerminal("TestGPT Terminal");
           terminal.sendText(command);
           terminal.show();
 
           if (streaming) {
-            setTimeout(() => {
-              window.showTextDocument(Uri.file(outputFilePath));
-            }, 1200);
+            window.showTextDocument(Uri.file(outputFilePath));
           }
         }
       },
