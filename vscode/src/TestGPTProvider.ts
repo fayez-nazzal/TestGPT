@@ -8,6 +8,8 @@ import {
   CancellationToken,
   WebviewView,
   WebviewViewResolveContext,
+  workspace,
+  ConfigurationTarget,
 } from "vscode";
 import { getUri, getNonce } from "./utils";
 import { parse, stringify } from "yaml";
@@ -122,7 +124,7 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
    */
   private _setWebviewMessageListener(webview: Webview) {
     webview.onDidReceiveMessage(
-      (message: any) => {
+      async (message: any) => {
         console.log("message", message);
         if (message.type === "preset") {
           const presetsUri = getUri(webview, this._extensionUri, ["resources", "presets.yaml"]);
@@ -151,6 +153,25 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
             return JSON.stringify(data).replace(/"/g, '\\"').replace(/`/g, "\\`");
           };
 
+          const apiKey = workspace.getConfiguration().get<string>("testgpt.apiKey");
+
+          if (!apiKey) {
+            const inputApiKey =
+              process.env.OPENAI_API_KEY ||
+              (await window.showInputBox({
+                prompt: "Enter your OpenAI API Key:",
+                ignoreFocusOut: true,
+              }));
+
+            if (!inputApiKey) {
+              return window.showErrorMessage("OpenAI API Key is required");
+            }
+
+            await workspace
+              .getConfiguration()
+              .update("testgpt.apiKey", inputApiKey, ConfigurationTarget.Global);
+          }
+
           const model = message.data.model;
           const streaming = message.data.streaming;
           const systemMessage = stringifyData(message.data.systemMessage);
@@ -158,7 +179,7 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
           const instructions = stringifyData(message.data.instructions);
           const techs = message.data.autoTechs ? "" : stringifyData(message.techs.join(", "));
           const examples = stringifyData(message.data.examples);
-          const key = process.env.OPENAI_API_KEY;
+          const key = workspace.getConfiguration().get<string>("testgpt.apiKey");
 
           if (!model || !outputFile || !systemMessage || !promptTemplate || !examples || !key) {
             console.error("Missing required fields");
