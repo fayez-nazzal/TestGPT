@@ -184,10 +184,10 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
           const promptTemplate = stringifyData(message.data.promptTemplate);
           const instructions = stringifyData(message.data.instructions);
           const techs = message.data.autoTechs ? "" : stringifyData(message.techs.join(", "));
-          const examples = stringifyData(message.data.examples);
+          const examples = message.data.examples.length && stringifyData(message.data.examples);
           const key = workspace.getConfiguration().get<string>("testgpt.apiKey");
 
-          if (!model || !outputFile || !systemMessage || !promptTemplate || !examples || !key) {
+          if (!model || !outputFile || !systemMessage || !promptTemplate || !key) {
             console.error("Missing required fields");
             window.showErrorMessage("Missing required fields");
             return;
