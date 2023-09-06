@@ -145,6 +145,12 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
           // use input file name only
           const inputFile = activeFilePath.split("/").pop();
 
+          // if input file is a test file, show error message
+          if (inputFile?.includes(".spec.") || inputFile?.includes(".test.")) {
+            window.showErrorMessage("Cannot run test on test file");
+            return;
+          }
+
           const defaultOutputFile = activeFilePath.replace(/\.[^/.]+$/, (ext) => `.spec${ext}`);
           const outputFilePath = message.data.outputFile || defaultOutputFile;
           const outputFile = outputFilePath.split("/").pop();
