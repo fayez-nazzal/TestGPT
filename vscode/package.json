@@ -26,7 +26,12 @@
           "testgpt.apiKey": {
             "type": "string",
             "default": "",
-            "description": "API Key for TestGPT"
+            "description": "OpenAI API Key"
+          },
+          "testgpt.advancedMode": {
+            "type": "boolean",
+            "default": false,
+            "description": "Advanced mode"
           }
         }
       }
