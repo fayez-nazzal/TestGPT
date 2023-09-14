@@ -146,7 +146,15 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
           const presetsUri = getUri(webview, this.context.globalStorageUri, ["presets.yaml"]);
           const presets = parse(fs.readFileSync(presetsUri.fsPath, "utf8"));
           const presetIndex = presets.findIndex((p: any) => p.name === message.data.name);
-          presets[presetIndex] = message.data;
+
+          if (presetIndex === -1) {
+            presets.push(message.data);
+          } else if (message.data) {
+            presets[presetIndex] = message.data;
+          } else {
+            presets.splice(presetIndex, 1);
+          }
+
           const strPresets = stringify(presets);
 
           fs.writeFileSync(presetsUri.fsPath, strPresets);

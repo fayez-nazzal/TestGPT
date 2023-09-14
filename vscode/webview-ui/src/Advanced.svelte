@@ -1,6 +1,5 @@
 <script lang="ts">
   import { vscode } from "./utilities/vscode";
-  import type { IPreset } from "./types";
   import type { EventHandler } from "svelte/elements";
   import TextArea from "./lib/TextArea.svelte";
   import Dropdown from "./lib/Dropdown.svelte";
@@ -42,6 +41,55 @@
   };
 
   let model = activePreset.config.model;
+
+  const onNewPreset = () => {
+    streaming = true;
+    systemMessage = "";
+    promptTemplate = "";
+    instructions = "";
+    examples = [];
+    autoTechs = true;
+    techs = [];
+    model = "gpt-3.5-turbo-16k";
+
+    const newPreset = {
+      name: "New Preset",
+      config: {
+        streaming,
+        systemMessage,
+        promptTemplate,
+        instructions,
+        examples,
+        autoTechs,
+        techs,
+        model,
+      },
+    };
+
+    presets = [...presets, newPreset];
+    activePreset = { ...newPreset };
+
+    setWebviewState("presets", presets);
+    setWebviewState("activePreset", activePreset);
+
+    vscode.postMessage({
+      type: "preset",
+      data: newPreset,
+    });
+  };
+
+  const onPresetDelete = () => {
+    const activePresetIndex = presets.findIndex((p) => p.name === activePreset.name);
+    presets.splice(activePresetIndex, 1);
+    activePreset = presets[0];
+    setWebviewState("presets", presets);
+    setWebviewState("activePreset", activePreset);
+
+    vscode.postMessage({
+      type: "preset",
+      data: null,
+    });
+  };
 
   $: {
     activePreset.config.streaming = streaming;
@@ -99,7 +147,13 @@
 </script>
 
 <main class="flex-col">
-  <Dropdown options={presets.map((p) => p.name)} setValue={onPresetChange} />
+  <Dropdown options={presets.map((p) => p.name)} value={activePreset.name} setValue={onPresetChange} />
+  <div class="flex">
+    <vscode-button style="flex: 1;" appearance="secondary" on:click={onNewPreset}> Add New </vscode-button>
+    <vscode-button style="background: #ee2143" on:click={onPresetDelete}> Delete </vscode-button>
+  </div>
+
+  <vscode-divider />
 
   <form on:submit={onSubmit}>
     <div class="flex-col">
@@ -107,7 +161,11 @@
       <vscode-button appearance="primary" on:click={onSubmit}> Generate Tests </vscode-button>
     </div>
 
-    <Dropdown options={["gpt-3.5-turbo-16k", "gpt-3.5-turbo", "gpt-4"]} setValue={(val) => (model = val)} />
+    <Dropdown
+      value={model}
+      options={["gpt-3.5-turbo-16k", "gpt-3.5-turbo", "gpt-4"]}
+      setValue={(val) => (model = val)}
+    />
 
     <vscode-checkbox on:click={handleStreamingClick} checked={streaming}>Enable Streaming</vscode-checkbox>
     <TextArea

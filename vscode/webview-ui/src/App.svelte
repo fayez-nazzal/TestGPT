@@ -35,7 +35,7 @@
   {#if !advanced}
     <div class="flex-col">
       <span class="label">Choose a preset</span>
-      <Dropdown options={presets.map((p) => p.name)} setValue={onPresetChange} />
+      <Dropdown value={activePreset.name} options={presets.map((p) => p.name)} setValue={onPresetChange} />
     </div>
 
     <div class="flex-col">
