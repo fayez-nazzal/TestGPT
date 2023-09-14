@@ -1,8 +1,9 @@
 {
   "name": "testgpt",
   "displayName": "TestGPT",
-  "description": "Automatic unit testing for your files using GPT-3.5-turbo model",
-  "version": "0.0.2",
+  "description": "Automatic AI Powered Testing for your code.",
+  "icon": "media/logo.png",
+  "version": "0.0.4",
   "publisher": "FayezNazzal",
   "repository": {
     "type": "git",
