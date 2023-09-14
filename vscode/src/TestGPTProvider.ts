@@ -12,11 +12,10 @@ import {
   ConfigurationTarget,
   ExtensionContext,
 } from "vscode";
-import { getUri, getNonce } from "./utils";
+import { getUri } from "./utils";
 import { parse, stringify } from "yaml";
 import * as fs from "fs";
 import { spawn } from "child_process";
-const { execFile } = require("child_process");
 
 export class TestGPTWebviewProvider implements WebviewViewProvider {
   public static currentPanel: TestGPTWebviewProvider | undefined;
@@ -83,55 +82,56 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
    * rendered within the webview panel
    */
   private _getWebviewContent(webview: Webview) {
-    // The CSS file from the React build output
-    const stylesUri = getUri(webview, this._extensionUri, ["webview-ui", "public", "build", "bundle.css"]);
+    try {
+      // The CSS file from the React build output
+      const stylesUri = getUri(webview, this._extensionUri, ["webview-ui", "public", "build", "bundle.css"]);
 
-    // The JS file from the React build output
-    const scriptUri = getUri(webview, this._extensionUri, ["webview-ui", "public", "build", "bundle.js"]);
+      // The JS file from the React build output
+      const scriptUri = getUri(webview, this._extensionUri, ["webview-ui", "public", "build", "bundle.js"]);
 
-    // Read yaml file from resources folder
-    const presetsUri = getUri(webview, this._extensionUri, ["resources", "default.yaml"]);
+      // Read yaml file from resources folder
+      const presetsUri = getUri(webview, this._extensionUri, ["resources", "default.yaml"]);
 
-    const globalStorageUri = this.context.globalStorageUri;
+      const globalStorageUri = this.context.globalStorageUri;
 
-    // move default.yaml to global storage if it doesn't exist
-    if (!fs.existsSync(globalStorageUri.fsPath)) {
-      fs.mkdirSync(globalStorageUri.fsPath);
-    }
+      // move default.yaml to global storage if it doesn't exist
+      if (!fs.existsSync(globalStorageUri.fsPath)) {
+        fs.mkdirSync(globalStorageUri.fsPath);
+      }
 
-    const presetsGlobalUri = getUri(webview, globalStorageUri, ["presets.yaml"]);
-    if (!fs.existsSync(presetsGlobalUri.fsPath)) {
-      fs.copyFileSync(presetsUri.fsPath, presetsGlobalUri.fsPath);
-    }
+      const presetsGlobalUri = getUri(webview, globalStorageUri, ["presets.yaml"]);
+      if (!fs.existsSync(presetsGlobalUri.fsPath)) {
+        fs.copyFileSync(presetsUri.fsPath, presetsGlobalUri.fsPath);
+      }
 
-    const fileStr = fs.readFileSync(presetsGlobalUri.fsPath, "utf8");
-    const presets = parse(fileStr);
+      const fileStr = fs.readFileSync(presetsGlobalUri.fsPath, "utf8");
+      const presets = parse(fileStr);
 
-    const nonce = getNonce();
-
-    // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
-    return /*html*/ `
-      <!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <title>TestGPT</title>
-          <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${
-            webview.cspSource
-          }; script-src 'nonce-${nonce}';">
-          <link rel="stylesheet" type="text/css" href="${stylesUri}">
-          <script nonce="${nonce}">
-            window.presets = ${JSON.stringify(presets)};
-            window.activePreset = ${JSON.stringify(presets[0])};
-            window.advanced = false;
-          </script>
-          <script defer nonce="${nonce}" src="${scriptUri}"></script>
-        </head>
-        <body>
-        </body>
+      // Tip: Install the es6-string-html VS Code extension to enable code highlighting below
+      return /*html*/ `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <title>TestGPT</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource};">
+    <link rel="stylesheet" type="text/css" href="${stylesUri}">
+    <script >
+    window.presets = ${JSON.stringify(presets)};
+    window.activePreset = ${JSON.stringify(presets[0])};
+    window.advanced = false;
+    </script>
+    <script defer src="${scriptUri}"></script>
+    </head>
+    <body>
+    </body>
       </html>
-    `;
+      `;
+    } catch (err) {
+      window.showErrorMessage(JSON.stringify(err));
+      return JSON.stringify(err);
+    }
   }
 
   /**

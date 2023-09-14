@@ -13,7 +13,6 @@ src/**
 
 # Ignore all webview-ui files except the build directory
 webview-ui/src/**
-webview-ui/public/**
 webview-ui/scripts/**
 webview-ui/index.html
 webview-ui/README.md

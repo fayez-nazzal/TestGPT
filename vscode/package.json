@@ -3,14 +3,14 @@
   "displayName": "TestGPT",
   "description": "Automatic AI Powered Testing for your code.",
   "icon": "media/logo.png",
-  "version": "0.0.4",
+  "version": "0.0.7",
   "publisher": "FayezNazzal",
   "repository": {
     "type": "git",
     "url": "https://github.com/fayez-nazzal/testgpt"
   },
   "engines": {
-    "vscode": "^1.76.0"
+    "vscode": "^1.82.0"
   },
   "main": "./out/extension.js",
   "contributes": {
@@ -61,7 +61,7 @@
     "start:webview": "cd webview-ui && npm run dev",
     "build:webview": "cd webview-ui && npm run build",
     "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
+    "compile": "npm run build:webview && tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts"
