@@ -14,9 +14,77 @@
     instructions: Only respond with the code directly, don't include any additional
       information. don't use markdown or any other formatting.
     techs:
-      - test
-    examples:
     autoTechs: true
+    examples:
+      - fileName: greetings.js
+        code: >-
+          function sayHello() {
+            return 'Hello';
+          }
+
+          function sayOhayo() {
+            return 'Ohayo';
+          }
+
+          function sayGoodbye() {
+            return 'Goodbye';
+          }
+
+          function saySomething(thing) {
+            return thing;
+          }
+
+          module.exports = {
+            sayHello,
+            sayOhayo,
+            sayGoodbye,
+            saySomething,
+          };
+        tests: >-
+          const { sayHello, sayOhayo, sayGoodbye, saySomething } = require('./greetings');
+
+          test('should say Hello', () => {
+            expect(sayHello()).toBe('Hello');
+          });
+
+          test('should say Ohayo', () => {
+            expect(sayOhayo()).toBe('Ohayo');
+          });
+
+          test('should say Goodbye', () => {
+            expect(sayGoodbye()).toBe('Goodbye');
+          });
+
+          test('should say something', () => {
+            expect(saySomething('Apple')).toBe('Apple');
+          });
+      - fileName: greetings.py
+        code: |-
+          def say_hello():
+              return 'Hello'
+
+          def say_ohayo():
+              return 'Ohayo'
+
+          def say_goodbye():
+              return 'Goodbye'
+
+          def say_something(thing):
+              return thing
+        tests: |-
+          from greetings import say_hello, say_ohayo, say_goodbye, say_something
+
+          def test_say_hello():
+              assert say_hello() == 'Hello'
+
+          def test_say_ohayo():
+              assert say_ohayo() == 'Ohayo'
+
+          def test_say_goodbye():
+              assert say_goodbye() == 'Goodbye'
+
+          def test_say_something():
+              assert say_something('Apple') == 'Apple'
 - name: React & Jest
   config:
     model: gpt-3.5-turbo-16k
