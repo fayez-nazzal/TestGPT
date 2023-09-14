@@ -62,7 +62,7 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
     TestGPTWebviewProvider.currentPanel = undefined;
 
     // Dispose of all disposables (i.e. commands) for the current webview panel
-    while (this._disposables.length) {
+    while (this._disposables?.length) {
       const disposable = this._disposables.pop();
       if (disposable) {
         disposable.dispose();
@@ -212,7 +212,7 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
           const promptTemplate = stringifyData(message.data.promptTemplate);
           const instructions = stringifyData(message.data.instructions);
           const techs = message.data.autoTechs ? "" : stringifyData(message.techs.join(", "));
-          const examples = message.data.examples.length && stringifyData(message.data.examples);
+          const examples = message.data.examples?.length && stringifyData(message.data.examples);
           const key = workspace.getConfiguration().get<string>("testgpt.apiKey");
 
           if (!model || !outputFile || !systemMessage || !promptTemplate || !key) {
