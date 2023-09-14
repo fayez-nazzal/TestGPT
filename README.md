@@ -1,20 +1,18 @@
 ![TestGPT - Logo Cover](https://github.com/fayez-nazzal/TestGPT/assets/49946791/77ec722a-dfb6-4f49-a4b1-d4b659219765)
 
-<img src="media/show.gif" alt="TestGPT Show" style="padding: 42px 0" />
-
 Your AI testing companion that writes tests on your behalf, automated to get you to build and ship faster without sacrificing tests.
 
-By default, TestGPT will use OpenAI gpt-3.5-turbo-16k model, but you have the option to use gpt-4, or any other model you want.
+<br />
 
-<hr />
+<img src="media/show.gif" alt="TestGPT Show" />
+
+<br />
+<hr /
 
 <br />
 
-<div align="center">
-   <img src="./show.gif" alt="Show" />
-</div>
+By default, TestGPT will use the OpenAI gpt-3.5-turbo-16k model, but you can use gpt-4, or any other model you want.
 
-<br />
 
 <h2>    <img style="padding-right: 4px;" src="https://storage.googleapis.com/fayeznazzal/TestGPT-logo.svg" width="24px" height="24px" />
  Installation
