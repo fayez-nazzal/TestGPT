@@ -3,7 +3,7 @@
   "displayName": "TestGPT",
   "description": "Automatic AI Powered Testing for your code.",
   "icon": "media/logo.png",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "publisher": "FayezNazzal",
   "repository": {
     "type": "git",
