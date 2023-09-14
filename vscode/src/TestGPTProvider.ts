@@ -115,7 +115,6 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
     <title>TestGPT</title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource};">
     <link rel="stylesheet" type="text/css" href="${stylesUri}">
     <script >
     window.presets = ${JSON.stringify(presets)};
