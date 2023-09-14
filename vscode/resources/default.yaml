@@ -35,307 +35,84 @@
     examples:
       - fileName: Header.tsx
         code: |-
-          import Link from 'next/link'
-          import { useRouter } from 'next/router'
+          import React from 'react';
 
-          export default function Header() {
-            const router = useRouter()
-
-            const isHome = router.pathname === '/'
-
-            return (
-              <header>
-                <Link href='/'>Home</Link>
-                {!isHome && <button onClick={() => router.back()}>Back</button>}
-              </header>
-            )
+          interface HeaderProps {
+            title: string;
+            subtitle: string;
           }
+
+          const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
+            return (
+              <div className="header">
+                <h1>{title}</h1>
+                <h2>{subtitle}</h2>
+              </div>
+            );
+          };
+
+          export default Header;
         tests: |-
-          import { render, screen } from '@testing-library/react'
-          import Header from './Header'
-          // import mockRouter from 'next-router-mock'
+          import React from 'react';
+          import { render } from '@testing-library/react';
+          import Header from './Header';
 
-          // mock the router for the Header component
-          jest.mock('next/router', () => require('next-router-mock'))
+          test('renders title and subtitle', () => {
+            const { getByText } = render(<Header title="My Title" subtitle="My Subtitle" />);
 
-          describe('Header', () => {
-            it('should render a link to the home page', () => {
-              render(<Header />)
-              const linkElement = screen.getByText('Home')
-              expect(linkElement).toBeInTheDocument()
-            }}
-          })
-      - fileName: Options.tsx
+            const titleElement = getByText(/My Title/i);
+            const subtitleElement = getByText(/My Subtitle/i);
+
+            expect(titleElement).toBeInTheDocument();
+            expect(subtitleElement).toBeInTheDocument();
+          });
+      - fileName: Dropdown.tsx
         code: >-
-          // @ts-nocheck
+          import React, { useState } from 'react';
 
-
-          import { useEffect, useState } from 'react'
-
-          import axios from 'axios'
-
-          import { apiURL } from '@/config'
-
-          import Row from 'react-bootstrap/Row'
-
-          import ScoopOption from './ScoopOption'
-
-          import ToppingOption from './ToppingOption'
-
-          import AlertBanner from './AlertBanner'
-
-          import { pricePerItem } from '@/constants'
-
-          import formatCurrency from '@/utils/formatCurrency'
-
-          import { useOrderDetails } from '@/contexts/OrderDetails'
-
-
-          interface Item {
-            name: string
-            imagePath: string
+          interface DropdownProps {
+            options: string[];
+            defaultOption: string;
           }
 
+          const Dropdown: React.FC<DropdownProps> = ({ options, defaultOption }) => {
+            const [selectedOption, setSelectedOption] = useState<string>(defaultOption);
 
-          interface Props {
-            optionType: string
-          }
-
-
-          // optionType is either 'scoops' or 'toppings'
-
-          export default function Options({ optionType }: Props) {
-            const [items, setItems] = useState<Item[]>([])
-            const [error, setError] = useState(false)
-            const { totals } = useOrderDetails()
-
-            // optionType is 'scoops' or 'toppings
-            useEffect(() => {
-              // * create an abort controller to cancel the request if it takes too long
-              // ? AbortController is a Javascript API that allows you to abort one or more DOM requests as and when desired
-              // ? @see https://developer.mozilla.org/en-US/docs/Web/API/AbortController
-              // ? (it is also needed here to prevent act()... errors during testing)
-              const controller = new AbortController()
-
-              axios
-                .get(`${apiURL}/${optionType}`, {
-                  // * thanks to the signal property axios now watches for the abort signal and cancels the request when it is received
-                  signal: controller.signal,
-                })
-                .then((response) => setItems(response.data))
-                .catch((error) => {
-                  if (error.name !== 'CanceledError') setError(true)
-                })
-
-              // * abort axios call on component unmount
-              return () => controller.abort()
-            }, [optionType])
-
-            if (error) return <AlertBanner />
-
-            const ItemComponent = optionType === 'scoops' ? ScoopOption : ToppingOption
-            const title = optionType[0].toUpperCase() + optionType.slice(1).toLowerCase()
-
-            const optionItems = items.map((item) => (
-              <ItemComponent
-                key={item.name}
-                name={item.name}
-                imagePath={item.imagePath}
-              />
-            ))
+            const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+              setSelectedOption(e.target.value);
+            };
 
             return (
-              <>
-                <h2>{title}</h2>
-                <p>{formatCurrency(pricePerItem[optionType])} each</p>
-                <p>
-                  {title} total: {formatCurrency(totals[optionType])}
-                </p>
-                <Row>{optionItems}</Row>
-              </>
-            )
-          }
+              <select className="dropdown" value={selectedOption} onChange={handleChange}>
+                {options.map((option, index) => (
+                  <option key={index} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            );
+          };
+
+          export default Dropdown;
         tests: >-
-          import { render, screen } from '@/test-utils'
+          import React from 'react';
+          import { render, fireEvent } from '@testing-library/react';
+          import Dropdown from './Dropdown';
 
-          import Options from './Options'
+          test('renders options and handles selection', () => {
+            const options = ['Apple', 'Banana', 'Cherry'];
+            const defaultOption = 'Apple';
+            
+            const { getByDisplayValue } = render(
+              <Dropdown options={options} defaultOption={defaultOption} />
+            );
 
+            // Check initial default value
+            expect(getByDisplayValue(defaultOption)).toBeInTheDocument();
 
-          describe('Options', () => {
-            test('displays image for each scoop option from server', async () => {
-              render(<Options optionType='scoops' />)
-
-              // find images
-              // NOTE: Every time we try to get data that is rendered from a fetch request (such as scoopImages), we need to use await and findBy*
-              const scoopImages = await screen.findAllByRole('img', { name: /scoop$/i })
-              // TIP: $ means ends with (we're looking for images alt attributes that ends with 'scoop')
-              expect(scoopImages).toHaveLength(2)
-
-              // get alt text from images and put into an array
-              const altTextArray = scoopImages.map((element: any) => element.alt)
-              expect(altTextArray).toEqual(['Chocolate scoop', 'Vanilla scoop'])
-            })
-
-            test('displays image for each topping option from server', async () => {
-              render(<Options optionType='toppings' />)
-
-              const toppingImages = await screen.findAllByRole('img', {
-                name: /topping$/i,
-              })
-              expect(toppingImages).toHaveLength(3)
-
-              const altTextArray = toppingImages.map((element: any) => element.alt)
-              expect(altTextArray).toEqual([
-                'Cherries topping',
-                'M&Ms topping',
-                'Hot fudge topping',
-              ])
-            })
-          })
-      - fileName: SummaryForm.tsx
-        code: >-
-          import { useState } from 'react'
-
-          import { useRouter } from 'next/router'
-
-          import Button from 'react-bootstrap/Button'
-
-          import Form from 'react-bootstrap/Form'
-
-          import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-
-          import Tooltip from 'react-bootstrap/Tooltip'
-
-          import { useOrderDetails } from '@/contexts/OrderDetails'
-
-          import toast, { Toaster } from 'react-hot-toast'
-
-
-          export default function SummaryForm() {
-            // @ts-ignore
-            const { totals } = useOrderDetails()
-            const [checked, setChecked] = useState(false)
-            const [disabled, setDisabled] = useState(true)
-            const router = useRouter()
-
-            const handleSubmit = (event: any) => {
-              event.preventDefault()
-
-              if (totals.scoops === 0) {
-                toast.error('Please add at least one scoop')
-                return
-              }
-
-              // send order to server or update context with order data
-              // ...
-
-              router.push('/sundaes-on-demand/order-confirmation')
-            }
-
-            const checkboxLabel = (
-              <>
-                I agree to{' '}
-                <OverlayTrigger
-                  placement='top'
-                  overlay={
-                    <Tooltip data-testid='terms-and-conditions-tooltip'>
-                      No ice cream will actually be delivered
-                    </Tooltip>
-                  }
-                >
-                  <span className='text-primary'>Terms and Conditions</span>
-                </OverlayTrigger>
-              </>
-            )
-
-            return (
-              <>
-                <Form onSubmit={handleSubmit}>
-                  <Form.Check
-                    type='switch'
-                    defaultChecked={checked}
-                    onChange={() => {
-                      setChecked(!checked)
-                      setDisabled(!disabled)
-                    }}
-                    id='terms-and-conditions'
-                  />
-                  <Form.Label htmlFor='terms-and-conditions'>{checkboxLabel}</Form.Label>
-
-                  <Button variant='primary' disabled={disabled} type='submit'>
-                    Confirm order
-                  </Button>
-
-                  <h1>{totals.scoops}</h1>
-                </Form>
-
-                <Toaster position='top-center' reverseOrder={false} />
-              </>
-            )
-          }
-        tests: >-
-          import { render, screen } from '@/test-utils'
-
-          import SummaryForm from './SummaryForm'
-
-          import userEvent from '@testing-library/user-event'
-
-          import { useRouter } from 'next/router'
-
-
-          jest.mock('next/router', () => ({
-            useRouter: jest.fn(),
-          }))
-
-
-          describe('SummaryForm', () => {
-            test('checkbox is unchecked by default, checking the checkbox enables the button, unchecking the checkbox disables the button', async () => {
-              // NOTE: Setup userEvent
-              const user = userEvent.setup()
-
-              render(<SummaryForm />)
-              const checkbox = screen.getByRole('checkbox', {
-                name: /I agree to Terms and Conditions/i,
-              })
-              const button = screen.getByRole('button', { name: /Confirm order/i })
-
-              //  Check initial state (checkbox is unchecked, button is disabled)
-              expect(checkbox).not.toBeChecked()
-              expect(button).toBeDisabled()
-
-              // Check state when checkbox is checked (button is enabled)
-              // NOTE: userEvent always returns a promise, so we need to await it
-              await user.click(checkbox)
-              expect(checkbox).toBeChecked()
-              expect(button).toBeEnabled()
-
-              // Check state when checkbox is unchecked (button is disabled)
-              await user.click(checkbox)
-              expect(checkbox).not.toBeChecked()
-              expect(button).toBeDisabled()
-            })
-
-            test('popover responds to hover', async () => {
-              render(<SummaryForm />)
-
-              const user = userEvent.setup()
-
-              // * popover starts out hidden
-              // NOTE: We are using queryBy* here because we expect the element to not be there
-              const nullPopover = screen.queryByText(
-                /no ice cream will actually be delivered/i
-              )
-              expect(nullPopover).not.toBeInTheDocument()
-
-              // * popover appears upon mouseover of checkbox label
-              const termsAndConditions = screen.getByText(/terms and conditions/i)
-              await user.hover(termsAndConditions)
-              const popover = screen.getByText(/no ice cream will actually be delivered/i)
-              expect(popover).toBeInTheDocument()
-
-              // * popover disappears when we mouse out
-              await user.unhover(termsAndConditions)
-              expect(popover).not.toBeInTheDocument()
-            })
-          })
-    autoTechs: true
+            // Change selection and verify
+            const dropdown = getByDisplayValue(defaultOption) as HTMLSelectElement;
+            fireEvent.change(dropdown, { target: { value: 'Banana' } });
+            
+            expect(getByDisplayValue('Banana')).toBeInTheDocument();
+          });

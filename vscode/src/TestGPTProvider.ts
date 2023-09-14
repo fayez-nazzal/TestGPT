@@ -240,7 +240,9 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
             fs.writeFileSync(outputFilePath, "");
           }
 
-          spawn("npx", args, { cwd: workspace.workspaceFolders?.[0].uri.fsPath });
+          const outputFileDir = outputFilePath.split("/").slice(0, -1).join("/");
+
+          const child = spawn("npx", args, { cwd: outputFileDir });
 
           if (streaming) {
             window.showTextDocument(Uri.file(outputFilePath));
