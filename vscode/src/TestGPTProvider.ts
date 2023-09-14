@@ -93,23 +93,17 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
       const presetsUri = getUri(webview, this._extensionUri, ["resources", "default.yaml"]);
 
       const globalStorageUri = this.context.globalStorageUri;
-      window.showInformationMessage("Loaded presets from " + presetsUri.fsPath);
-      window.showInformationMessage("Loaded presets from " + globalStorageUri.fsPath);
       // move default.yaml to global storage if it doesn't exist
       if (!fs.existsSync(globalStorageUri.fsPath)) {
         fs.mkdirSync(globalStorageUri.fsPath);
       }
 
       const presetsGlobalUri = getUri(webview, globalStorageUri, ["presets.yaml"]);
-      window.showInformationMessage("Loaded presets from " + presetsGlobalUri.fsPath);
       if (!fs.existsSync(presetsGlobalUri.fsPath)) {
-        window.showInformationMessage("copying presets");
         fs.copyFileSync(presetsUri.fsPath, presetsGlobalUri.fsPath);
-        window.showInformationMessage("copied presets");
       }
 
       const fileStr = fs.readFileSync(presetsGlobalUri.fsPath, "utf8");
-      window.showInformationMessage("Loaded presets from " + presetsGlobalUri.fsPath);
 
       const presets = parse(fileStr);
 
