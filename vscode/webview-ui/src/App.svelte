@@ -1,21 +1,18 @@
 <script lang="ts">
   import { provideVSCodeDesignSystem, allComponents } from "@vscode/webview-ui-toolkit";
   import { vscode } from "./utilities/vscode";
-  import type { IPreset } from "./types";
   import Advanced from "./Advanced.svelte";
   import Dropdown from "./lib/Dropdown.svelte";
   import Logo from "./lib/Logo.svelte";
+  import { getWebviewState, setWebviewState } from "./lib/utils";
 
   provideVSCodeDesignSystem().register(allComponents);
 
-  let presets = ((window as any).presets as IPreset[]) || [];
-  let activePreset = ((window as any).activePreset as IPreset) || {
-    name: "Default Preset",
-    config: {},
-  };
+  let { presets, activePreset, advanced } = getWebviewState();
 
   const onPresetChange = (preset: string) => {
     activePreset = presets.find((p) => p.name === preset)!;
+    setWebviewState("activePreset", activePreset);
   };
 
   const onSubmit = (event: Event) => {
@@ -28,10 +25,9 @@
     });
   };
 
-  let advanced = false;
-
   const onAdvancedToggle = () => {
     advanced = !advanced;
+    setWebviewState("advanced", advanced);
   };
 </script>
 

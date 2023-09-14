@@ -10,11 +10,11 @@ import {
   WebviewViewResolveContext,
   workspace,
   ConfigurationTarget,
+  ExtensionContext,
 } from "vscode";
 import { getUri, getNonce } from "./utils";
 import { parse, stringify } from "yaml";
 import * as fs from "fs";
-import * as cp from "child_process";
 
 export class TestGPTWebviewProvider implements WebviewViewProvider {
   public static currentPanel: TestGPTWebviewProvider | undefined;
@@ -23,13 +23,15 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
   private _view?: WebviewView;
   private _disposables: Disposable[] = [];
   private _extensionUri: Uri;
+  private context: ExtensionContext;
 
   /**
    * @param panel A reference to the webview panel
    * @param extensionUri The URI of the directory containing the extension
    */
-  constructor(extensionUri: Uri) {
+  constructor(extensionUri: Uri, context: ExtensionContext) {
     this._extensionUri = extensionUri;
+    this.context = context;
   }
 
   resolveWebviewView(
@@ -86,8 +88,22 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
     const scriptUri = getUri(webview, this._extensionUri, ["webview-ui", "public", "build", "bundle.js"]);
 
     // Read yaml file from resources folder
-    const presetsUri = getUri(webview, this._extensionUri, ["resources", "presets.yaml"]);
-    const presets = parse(fs.readFileSync(presetsUri.fsPath, "utf8"));
+    const presetsUri = getUri(webview, this._extensionUri, ["resources", "default.yaml"]);
+
+    const globalStorageUri = this.context.globalStorageUri;
+
+    // move default.yaml to global storage if it doesn't exist
+    if (!fs.existsSync(globalStorageUri.fsPath)) {
+      fs.mkdirSync(globalStorageUri.fsPath);
+    }
+
+    const presetsGlobalUri = getUri(webview, globalStorageUri, ["presets.yaml"]);
+    if (!fs.existsSync(presetsGlobalUri.fsPath)) {
+      fs.copyFileSync(presetsUri.fsPath, presetsGlobalUri.fsPath);
+    }
+
+    const fileStr = fs.readFileSync(presetsGlobalUri.fsPath, "utf8");
+    const presets = parse(fileStr);
 
     const nonce = getNonce();
 
@@ -106,6 +122,7 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
           <script nonce="${nonce}">
             window.presets = ${JSON.stringify(presets)};
             window.activePreset = ${JSON.stringify(presets[0])};
+            window.advanced = false;
           </script>
           <script defer nonce="${nonce}" src="${scriptUri}"></script>
         </head>
@@ -125,9 +142,8 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
   private _setWebviewMessageListener(webview: Webview) {
     webview.onDidReceiveMessage(
       async (message: any) => {
-        console.log("message", message);
         if (message.type === "preset") {
-          const presetsUri = getUri(webview, this._extensionUri, ["resources", "presets.yaml"]);
+          const presetsUri = getUri(webview, this.context.globalStorageUri, ["presets.yaml"]);
           const presets = parse(fs.readFileSync(presetsUri.fsPath, "utf8"));
           const presetIndex = presets.findIndex((p: any) => p.name === message.data.name);
           presets[presetIndex] = message.data;

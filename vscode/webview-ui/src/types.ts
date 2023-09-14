@@ -15,3 +15,9 @@ export interface IPreset {
     }[];
   };
 }
+
+export interface IVscodeState {
+  presets: IPreset[];
+  activePreset: IPreset;
+  advanced: boolean;
+}

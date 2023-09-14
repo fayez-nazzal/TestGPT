@@ -5,12 +5,9 @@
   import TextArea from "./lib/TextArea.svelte";
   import Dropdown from "./lib/Dropdown.svelte";
   import RemoveButton from "./lib/RemoveButton.svelte";
+  import { getWebviewState, setWebviewState } from "./lib/utils";
 
-  let presets = ((window as any).presets as IPreset[]) || [];
-  let activePreset = ((window as any).activePreset as IPreset) || {
-    name: "Default Preset",
-    config: {},
-  };
+  let { presets, activePreset } = getWebviewState();
 
   let systemMessage = activePreset.config.systemMessage;
   let promptTemplate = activePreset.config.promptTemplate;
@@ -60,10 +57,16 @@
       type: "preset",
       data: activePreset,
     });
+
+    const activePresetIndex = presets.findIndex((p) => p.name === activePreset.name);
+    presets[activePresetIndex] = activePreset;
+    presets = [...presets];
+    setWebviewState("presets", presets);
   }
 
   const onPresetChange = (preset: string) => {
     activePreset = presets.find((p) => p.name === preset)!;
+
     streaming = activePreset.config.streaming;
     systemMessage = activePreset.config.systemMessage;
     promptTemplate = activePreset.config.promptTemplate;
@@ -72,6 +75,8 @@
     autoTechs = activePreset.config.autoTechs;
     techs = activePreset.config.techs as string[];
     model = activePreset.config.model;
+
+    setWebviewState("activePreset", activePreset);
   };
 
   const onSubmit = (event: Event) => {
