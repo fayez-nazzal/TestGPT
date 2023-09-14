@@ -15,6 +15,8 @@ import {
 import { getUri, getNonce } from "./utils";
 import { parse, stringify } from "yaml";
 import * as fs from "fs";
+import { spawn } from "child_process";
+const { execFile } = require("child_process");
 
 export class TestGPTWebviewProvider implements WebviewViewProvider {
   public static currentPanel: TestGPTWebviewProvider | undefined;
@@ -171,7 +173,7 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
 
           // if input file is a test file, show error message
           if (inputFile?.includes(".spec.") || inputFile?.includes(".test.")) {
-            window.showErrorMessage("Cannot run test on test file");
+            window.showErrorMessage("Cannot generate tests from test file");
             return;
           }
 
@@ -180,7 +182,10 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
           const outputFile = outputFilePath.split("/").pop();
 
           const stringifyData = (data: any) => {
-            return JSON.stringify(data).replace(/"/g, '\\"').replace(/`/g, "\\`");
+            const unescaped = JSON.stringify(data);
+
+            // escape anything needed so that it can be passed as a CLI command
+            return unescaped;
           };
 
           const apiKey = workspace.getConfiguration().get<string>("testgpt.apiKey");
@@ -217,36 +222,26 @@ export class TestGPTWebviewProvider implements WebviewViewProvider {
             return;
           }
 
-          let command = `npx --yes testgpt@latest`;
+          // Initialize an array to hold the command and its arguments
+          let args = ["--yes", "testgpt@latest"];
 
-          if (inputFile) command += ` -i "${inputFile}"`;
-
-          if (outputFile) command += ` -o "${outputFile}"`;
-
-          if (model) command += ` -m "${model}"`;
-
-          if (key) command += ` -k "${key}"`;
-
-          if (systemMessage) command += ` -y "${systemMessage}"`;
-
-          if (promptTemplate) command += ` -p "${promptTemplate}"`;
-
-          if (techs) command += ` -t "${techs}"`;
-
-          if (examples) command += ` -x "${examples}"`;
-
-          if (streaming) command += ` -s`;
-
-          if (instructions) command += ` -n "${instructions}"`;
+          if (inputFile) args.push("-i", inputFile);
+          if (outputFile) args.push("-o", outputFile);
+          if (model) args.push("-m", model);
+          if (key) args.push("-k", key);
+          if (systemMessage) args.push("-y", systemMessage);
+          if (promptTemplate) args.push("-p", promptTemplate);
+          if (techs) args.push("-t", techs);
+          if (examples) args.push("-x", examples);
+          if (streaming) args.push("-s");
+          if (instructions) args.push("-n", instructions);
 
           // create output file if it doesn't exist
           if (!fs.existsSync(outputFilePath)) {
             fs.writeFileSync(outputFilePath, "");
           }
 
-          const terminal = window.createTerminal("TestGPT Terminal");
-          terminal.sendText(command);
-          terminal.show();
+          spawn("npx", args, { cwd: workspace.workspaceFolders?.[0].uri.fsPath });
 
           if (streaming) {
             window.showTextDocument(Uri.file(outputFilePath));
