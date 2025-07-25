@@ -180,7 +180,7 @@ export const getTestContent = async ({
 
   // remove lines that start with ``` (markdown code block)
   const regex = /^```.*$/gm;
-  return response.choices[0].message?.content?.replace(regex, "");
+    return response.generated_text.replace(regex, "").trim();
 };
 
 export interface IStreamTestContentArgs {
